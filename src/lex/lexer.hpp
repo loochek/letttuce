@@ -34,24 +34,29 @@ class Lexer {
 
   std::optional<Token> MatchOperators();
 
-  std::optional<TokenType> MatchOperator();
+  std::optional<TokenType> PeekOperator();
 
   ////////////////////////////////////////////////////////////////////
 
-  std::optional<Token> MatchLiterls();
+  std::optional<Token> MatchLiterals();
 
   std::optional<Token> MatchNumericLiteral();
 
   std::optional<Token> MatchStringLiteral();
 
-  std::optional<Token> MatchCharLiteral();
-
   std::optional<Token> MatchWords();
 
   ////////////////////////////////////////////////////////////////////
 
+  template<typename Func>
+  void MoveNextWhileCond(Func func) {
+    while (scanner_.CurrentSymbol() != EOF && func()) {
+      scanner_.MoveNext();
+    }
+  }
+
  private:
-  // For easy access to locations
+//  // For easy access to locations
   Token prev_{};
 
   // Current token

@@ -86,8 +86,8 @@ cd build && make -j8
   | `NOT`                      | `!`                        |
   | `LT`                       | `<`                        |
   | `GT`                       | `>`                        |
-  | `LEFT_PAREN`               | `(`                        |
-  | `RIGHT_PAREN`              | `)`                        |
+  | `LEFT_BRACE`               | `(`                        |
+  | `RIGHT_BRACE`              | `)`                        |
   | `LEFT_CBRACE`              | `{`                        |
   | `RIGHT_CBRACE`             | `}`                        |
   | `COMMA`                    | `,`                        |

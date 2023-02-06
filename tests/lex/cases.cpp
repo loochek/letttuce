@@ -1,7 +1,7 @@
 #include <lex/lexer.hpp>
 
 // Finally,
-#include <catch2/catch.hpp>
+#include "../catch_amalgamated.hpp"
 
 #include <iostream>
 
@@ -16,7 +16,7 @@ TEST_CASE("Lexer: Just works", "[lex]") {
   CHECK(l.Matches(lex::TokenType::NUMBER));
 }
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
 TEST_CASE("Braces", "[lex]") {
   std::stringstream source("1 + (1)");
@@ -81,7 +81,7 @@ TEST_CASE("Statement", "[lex]") {
   CHECK(l.Matches(lex::TokenType::IDENTIFIER));
   CHECK(l.Matches(lex::TokenType::ASSIGN));
   CHECK(l.Matches(lex::TokenType::NUMBER));
-  CHECK(l.Matches(lex::TokenType::SEMICOLUMN));
+  CHECK(l.Matches(lex::TokenType::SEMICOLON));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ TEST_CASE("Assign vs Equals", "[lex]") {
   CHECK(l.Matches(lex::TokenType::EQUALS));
 }
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
 TEST_CASE("Lex types", "[lex]") {
   std::stringstream source(": Int Bool String Unit");
@@ -141,4 +141,4 @@ TEST_CASE("Lex types", "[lex]") {
   CHECK(l.Matches(lex::TokenType::TY_UNIT));
 }
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
