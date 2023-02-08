@@ -14,7 +14,7 @@ add_compile_options(-Wall -Wextra)
 # --------------------------------------------------------------------
 
 find_package(fmt REQUIRED)
-find_package(Catch2 REQUIRED)
+find_package(Catch2 2 REQUIRED)
 
 # --------------------------------------------------------------------
 

@@ -1,9 +1,10 @@
 #include <lex/lexer.hpp>
 
 // Finally,
-#include "../catch_amalgamated.hpp"
+#include <catch2/catch.hpp>
 
 #include <iostream>
+#include <sstream>
 
 //////////////////////////////////////////////////////////////////////
 
