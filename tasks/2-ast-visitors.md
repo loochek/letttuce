@@ -2,13 +2,15 @@
 # 2. AST и Visitor-ы
 
 В предыдующем задании мы научились преобразовывать поток символов в поток
-токенов. Следующая фаза компилятора — синтакскический анализ, т.е. парсинг.
+_токенов_. Следующая фаза компилятора — **синтакскический анализ**, т.е. _парсинг_.
 
-Парсер преобразует плоский поток токенов в более богатое предстваление — AST, абстрактное синтаксическое дерево.
+Парсер преобразует плоский поток токенов в более богатое предстваление
+— AST, _абстрактное синтаксическое дерево._
 
 Все последующие этапы компилятора оперируют с некой формой AST.
 
-Данное задание о том, как представлять код и обращаться с ним алгоритмически.
+Но перед этим давайте подумаем о том, как **представлять код** и 
+как **обращаться с ним** алгоритмически.
 
 ## О грамматике языка Étude
 
@@ -32,7 +34,7 @@
 
 Это позволяет писать выражения следующего вида:
 
-```go
+```etude
 var candidate = if node_value < val {
     &tree->left
 } else {
@@ -57,20 +59,20 @@ var candidate = if node_value < val {
 
 Первый набор правил, с которыми мы встретимся — **объявления**. 
 
-```
+```ebnf
 <file> ::= <declaration>*
 
 <declaration> ::= <function-definition>
                 | <variable-declaration>
 
 <function-declaration> ::= fun <identifier> <parameter-list> = <expression> ;
-    <parameter-list> ::= <identifier>*
+      <parameter-list> ::= <identifier>*
 
 <variable-declaration> ::= var <identifier> = <expression> ;
 ```
 
-Файл для нас сейчас представляет последовательность объявлений, каждое из
-которых является либо функцией, либо переменной. Например, так:
+**Файл** для нас сейчас представляет **последовательность объявлений**, каждое из
+которых является либо _функцией_, либо _переменной_. Например, так:
 
 ```etude
 # File: main.et
@@ -83,9 +85,9 @@ fun main argc argv = {
 };
 ```
 
-Базовая структура AST представляет собой контейнер для содежащихся в правиле
-данных. В будущем мы, вероятно, захотим хранить дополнительную информацию в
-вершинах AST, например, тип для выражений, но пока этого достаточно.
+Базовая структура AST представляет собой **контейнер для данных**, содежащихся 
+в правиле. (В будущем мы, вероятно, захотим хранить дополнительную информацию в
+вершинах AST, например, тип для выражений, но пока этого достаточно)
 
 ```cpp
 class FunDeclStatement : public Declaration {
@@ -106,23 +108,24 @@ class FunDeclStatement : public Declaration {
 **Expression Statement** позволяет вычислить выражение и выкинуть результат.
 
 **Assignment Statement** присваивает новое значение переменной содержащейся в
-*области видимости* (об этом позже). В языке Си это также является выражением.
-А в Go, например, утверждением.
+*области видимости* (об этом позже). В языке Go это также является утверждением.
+А в Си, например, выражением.
 
-```
+```ebnf
 <statement> ::= <expression-statement>
               | <assignment-statement>
 
 <expression-statement> ::= <expression> ;
 
 <assignment-statement> ::= <unary-expression> = <expression>
+
 ```
 
 ### Expressions
 
 Самая громоздкая часть. Про правила подробно поговорим в следующий раз.
 
-```
+```ebnf
 <expression> ::= <equality-expression>
 
 <equality-expression> ::= <relational-expression>
@@ -144,8 +147,8 @@ class FunDeclStatement : public Declaration {
                               | <multiplicative-expression> / <unary-expression>
 ```
 
-Пока достаточно заметить, что многие из них являются простыми бинарными
-отношениями: `==`, `>`, `*`, `+`. Для них вы можете сделать несколько типов
+Пока достаточно заметить, что многие из них являются простыми **бинарными
+отношениями**: `==`, `>`, `*`, `+`. Для них вы можете сделать несколько типов
 данных, где каждый наследник `BinaryNode` или всего один, а тип отличать по
 токену операции. А может быть что-то посередине, делайте, как вам нравится =).
 
@@ -159,7 +162,9 @@ class FunDeclStatement : public Declaration {
 | Почему `<keyword-expression>` принимают `<expression>` ? Они очень похожи на `<unary-expression>` | Они жадные для удобства, чтобы не писать `return (a == b)` | 
 
 
-```
+...продолжение грамматики
+
+```ebnf
 <unary-expression> ::= <postfix-expression>
                      | <unary-operator> <unary-expression>
 
@@ -167,7 +172,7 @@ class FunDeclStatement : public Declaration {
                    | !
 
 <postfix-expression> ::= <primary-expression>
-                       | <postfix-expression> ( {<expression>,}* )
+                       | <postfix-expression> ( <expression>,* )
 
 <primary-expression> ::= <identifier>
                        | <constant>
@@ -175,7 +180,7 @@ class FunDeclStatement : public Declaration {
                        | <compound-expression>
                        | ( <expression> )
 
-<compound-expression> ::= { {<declaration> | <statement>}* <expression>? }
+<compound-expression> ::= { (<declaration> | <statement>)* <expression>? }
 
 <keyword-expression> ::= return <expression>
                        | yield <expression>
@@ -186,20 +191,19 @@ class FunDeclStatement : public Declaration {
 
 <constant> ::= <integer-constant>
              | <string>
-
 ```
 
 ### Tree Node
 
 Для удобства все категории наследуются от общего предка `TreeNode`, содержащёго
-виртуальный метод. `GetLocation()`
+набор виртуальных методов: `GetLocation()`, `Accept(Visitor*)`, `~TreeNode()`.
 
 ```
 
                           +--------------+               
-                          |              |               
-                          |  Tree Node   |               
-                          |              |               
+                          |              |  <<----  virtual void Accept(Visitor* visitor) = 0;             
+                          |  Tree Node   |  <<----  virtual lex::Location GetLocation() = 0;             
+                          |              |  <<----  virtual ~TreeNode() = default;             
                           +--------------+               
                           /       |      \               
                          /        |       \              
@@ -225,7 +229,7 @@ class FunDeclStatement : public Declaration {
 4. Создайте **контретного визитора**, реализующего печать дерева рекурсивным обходом.
 5. Вручную создайте небольшое дерево и примените к нему `PrintVisitor`.
 
-Цель — создать структуры данных, которые будут результатом работы парсера.
+Цель — создать структуры данных, которые будут результатом работы парсера.  
 Цель 2 — научиться работать с представлением программы в виде AST.
 
 ## Реализация
@@ -241,7 +245,7 @@ class FunDeclStatement : public Declaration {
 
   | Domain                    |  Возвращаемое значение         |
   |---------------------------|--------------------------------|
-  | Абстрактная интерпретация | Представление значения в языке |
+  | Интерпретация             | Представление значения в языке |
   | Проверка типов            | Структура типа в компиляторе   |
   | Перепиывание AST          | Вершина AST                    |
 
@@ -265,7 +269,8 @@ class FunDeclStatement : public Declaration {
   Иногда визитор определён не на всех вершинах дерева. Забегая вперёд, так
   работает, например, `GenAddress`-visitor. Не у всего можно вычислить адрес.
   
-  Тогда удобно сделать дополнительную структуру, которая аварийно завершается на всех вершинах AST, а в наследнике переопределять только интересующие нас случаи.
+  Тогда удобно сделать дополнительную структуру, которая аварийно завершается 
+  на всех вершинах AST, а в наследнике переопределять только интересующие нас случаи.
   
   ```cpp
   class AbortVisitor : public Visitor {
@@ -281,7 +286,11 @@ class FunDeclStatement : public Declaration {
 ## Appendix A. Grammar
 
 
-```
+```ebnf
+////////////////////////////////////////////////////////////////////////////////////
+//!                             Declarations
+////////////////////////////////////////////////////////////////////////////////////
+
 
 <file> ::= <declaration>*
 
@@ -293,11 +302,9 @@ class FunDeclStatement : public Declaration {
 <variable-declaration> ::= var <identifier> = <expression> ;
 
 
-
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////////
+//!                             Expressions
+////////////////////////////////////////////////////////////////////////////////////
 
 
 <expression> ::= <equality-expression>
@@ -348,11 +355,9 @@ class FunDeclStatement : public Declaration {
              | <string>
 
 
-
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////////
+//!                             Statements
+////////////////////////////////////////////////////////////////////////////////////
 
 
 <statement> ::= <expression-statement>
@@ -362,8 +367,6 @@ class FunDeclStatement : public Declaration {
 
 <assignment-statement> ::= <unary-expression> = <expression>
 
+
+////////////////////////////////////////////////////////////////////////////////////
 ```
-
-## Interesting Aritcles:
-
-- [Simple but Powerful Pratt Parsing](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
