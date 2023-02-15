@@ -217,7 +217,8 @@ std::optional<Token> Lexer::MatchStringLiteral() {
   } else {
     Location end_loc = scanner_.GetLocation();
     scanner_.MoveNext();
-    return Token(TokenType::STRING, start_loc, scanner_.GetSlice(start_loc, end_loc));
+    return Token(TokenType::STRING, start_loc,
+                 scanner_.GetSlice(start_loc, end_loc));
   }
 }
 
@@ -240,7 +241,8 @@ std::optional<Token> Lexer::MatchWords() {
   Location end_loc = scanner_.GetLocation();
   std::string_view word = scanner_.GetSlice(start_loc, end_loc);
 
-  // The word would be a keyword if it matches with some template, and identifier otherwise
+  // The word would be a keyword if it matches with some template, and
+  // identifier otherwise
   TokenType word_type = table_.LookupWord(word);
   return Token(word_type, start_loc, word);
 }

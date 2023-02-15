@@ -65,7 +65,8 @@ class Scanner {
   }
 
   void MoveNextLine() {
-    while (curr_loc_.abs_pos < buffer_.length() && buffer_[curr_loc_.abs_pos] != '\n') {
+    while (curr_loc_.abs_pos < buffer_.length() &&
+           buffer_[curr_loc_.abs_pos] != '\n') {
       curr_loc_.abs_pos++;
     }
 
@@ -92,11 +93,12 @@ class Scanner {
   // [start;end)
   std::string_view GetSlice(Location start, Location end) const {
     FMT_ASSERT(start.abs_pos <= buffer_.length() &&
-               end.abs_pos <= buffer_.length() &&
-               start.abs_pos < end.abs_pos,
+                   end.abs_pos <= buffer_.length() &&
+                   start.abs_pos < end.abs_pos,
                "Could not match any token\n");
 
-    return std::string_view(&buffer_[start.abs_pos], end.abs_pos - start.abs_pos);
+    return std::string_view(&buffer_[start.abs_pos],
+                            end.abs_pos - start.abs_pos);
   }
 
  private:

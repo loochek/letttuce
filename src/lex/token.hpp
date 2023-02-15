@@ -17,13 +17,15 @@ struct Token {
   DataType data;
 
   Token() = default;
-  Token(TokenType type, const Location& location, const DataType& data = std::monostate())
-      : type(type), location(location), data(data) {}
+  Token(TokenType type, const Location& location,
+        const DataType& data = std::monostate())
+      : type(type), location(location), data(data) {
+  }
 
-//    std::string Format() const {
-//        return fmt::format("type = {}, data = {}, {}",
-//                           FormatTokenType(type), data, location.Format());
-//    }
+  //    std::string Format() const {
+  //        return fmt::format("type = {}, data = {}, {}",
+  //                           FormatTokenType(type), data, location.Format());
+  //    }
 };
 
 //////////////////////////////////////////////////////////////////////

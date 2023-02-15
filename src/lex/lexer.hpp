@@ -48,7 +48,7 @@ class Lexer {
 
   ////////////////////////////////////////////////////////////////////
 
-  template<typename Func>
+  template <typename Func>
   void MoveNextWhileCond(Func func) {
     while (scanner_.CurrentSymbol() != EOF && func()) {
       scanner_.MoveNext();
@@ -56,7 +56,7 @@ class Lexer {
   }
 
  private:
-//  // For easy access to locations
+  //  // For easy access to locations
   Token prev_{};
 
   // Current token
