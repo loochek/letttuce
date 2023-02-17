@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <cstdlib>
 
 namespace lex {
@@ -122,6 +123,8 @@ inline const char* FormatTokenType(TokenType type) {
       return "Unit";
     case TokenType::TOKEN_EOF:
       return "<EOF>";
+    default:
+      FMT_ASSERT(false, "Unknown token type");
   }
 }
 

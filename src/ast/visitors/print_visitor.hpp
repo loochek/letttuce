@@ -101,7 +101,7 @@ class PrintVisitor : public Visitor {
 
     INDENTED(fmt::print("Params: "));
     for (auto& param : decl->params_) {
-      fmt::print(param.GetIdentifier());
+      fmt::print("{}", param.GetIdentifier());
       fmt::print(" ");
     }
     fmt::print("\n");
