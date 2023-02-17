@@ -11,23 +11,22 @@
 
 class Statement : public TreeNode {
  public:
-  virtual void Accept(Visitor* /* visitor */){};
+  void Accept(Visitor* /* visitor */) override {};
 };
 
 //////////////////////////////////////////////////////////////////////
 
 class ExprStatement : public Statement {
  public:
-  ExprStatement(Expression* expr) : expr_{expr} {
+  explicit ExprStatement(Expression* expr) : expr_{expr} {
   }
 
-  virtual void Accept(Visitor*) override {
-    // visitor->VisitExprStatement(this);
-    std::abort();
+  void Accept(Visitor* visitor) override {
+    visitor->VisitExprStatement(this);
   }
 
-  virtual lex::Location GetLocation() override {
-    std::abort();
+  lex::Location GetLocation() override {
+    return expr_->GetLocation();
   }
 
   Expression* expr_;
@@ -37,18 +36,19 @@ class ExprStatement : public Statement {
 
 class AssignmentStatement : public Statement {
  public:
-  AssignmentStatement() {
+  explicit AssignmentStatement(LvalueExpression* lhs, Expression* rhs) : lhs_{lhs}, rhs_{rhs} {
   }
 
-  virtual void Accept(Visitor*) override {
-    std::abort();
+  void Accept(Visitor* visitor) override {
+    visitor->VisitAssignmentStatement(this);
   }
 
-  virtual lex::Location GetLocation() override {
-    std::abort();
+  lex::Location GetLocation() override {
+    return lhs_->GetLocation();
   }
 
-  // ???
+  LvalueExpression* lhs_;
+  Expression* rhs_;
 };
 
 //////////////////////////////////////////////////////////////////////

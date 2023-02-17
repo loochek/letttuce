@@ -10,7 +10,7 @@
 
 class Declaration : public Statement {
  public:
-  virtual void Accept(Visitor*){};
+  void Accept(Visitor*) override {};
 
   virtual std::string_view GetName() = 0;
 };
@@ -18,13 +18,50 @@ class Declaration : public Statement {
 //////////////////////////////////////////////////////////////////////
 
 class VarDeclStatement : public Declaration {
-  // Your code goes here
+ public:
+  VarDeclStatement(lex::Token name, Expression* expr)
+      : name_{name}, expr_{expr} {
+  }
+
+  void Accept(Visitor* visitor) override {
+    visitor->VisitVarDeclaration(this);
+  }
+
+  lex::Location GetLocation() override {
+    return name_.location;
+  }
+
+  std::string_view GetName() override {
+    return name_.GetIdentifier();
+  }
+
+  lex::Token name_;
+  Expression* expr_;
 };
 
 //////////////////////////////////////////////////////////////////////
 
 class FunDeclStatement : public Declaration {
-  // Your code goes here
+ public:
+  FunDeclStatement(lex::Token name, std::vector<lex::Token> params, Expression* body)
+      : name_{name}, params_{std::move(params)}, body_{body} {
+  }
+
+  void Accept(Visitor* visitor) override {
+    visitor->VisitFunDeclaration(this);
+  }
+
+  std::string_view GetName() override {
+    return name_.GetIdentifier();
+  }
+
+  lex::Location GetLocation() override {
+    return name_.location;
+  }
+
+  lex::Token name_;
+  std::vector<lex::Token> params_;
+  Expression* body_;
 };
 
 //////////////////////////////////////////////////////////////////////

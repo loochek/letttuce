@@ -17,9 +17,27 @@ struct Token {
   DataType data;
 
   Token() = default;
-  Token(TokenType type, const Location& location,
-        const DataType& data = std::monostate())
-      : type(type), location(location), data(data) {
+  Token(TokenType type, Location location,
+        DataType data = std::monostate())
+      : type{type}, location{location}, data{data} {
+  }
+
+  std::string_view GetIdentifier() const {
+    FMT_ASSERT(type == TokenType::IDENTIFIER,
+               "Requesting the name of non-identifier");
+    return std::get<std::string_view>(data);
+  }
+
+  explicit operator std::string() {
+    if (auto* str = get_if<std::string_view>(&data)) {
+      return std::string(*str);
+    }
+
+    if (auto* num = get_if<int>(&data)) {
+      return std::to_string(*num);
+    }
+
+    FMT_ASSERT(false, "Attempt to request a string from token with no data");
   }
 
   //    std::string Format() const {
