@@ -11,7 +11,7 @@
 
 class Statement : public TreeNode {
  public:
-  void Accept(Visitor* /* visitor */) override {};
+  void Accept(Visitor* /* visitor */) override{};
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -36,7 +36,9 @@ class ExprStatement : public Statement {
 
 class AssignmentStatement : public Statement {
  public:
-  explicit AssignmentStatement(LvalueExpression* lhs, Expression* rhs) : lhs_{lhs}, rhs_{rhs} {
+  explicit AssignmentStatement(lex::Token assn_token, LvalueExpression* lhs,
+                               Expression* rhs)
+      : assn_token_{assn_token}, lhs_{lhs}, rhs_{rhs} {
   }
 
   void Accept(Visitor* visitor) override {
@@ -44,9 +46,10 @@ class AssignmentStatement : public Statement {
   }
 
   lex::Location GetLocation() override {
-    return lhs_->GetLocation();
+    return assn_token_.location;
   }
 
+  lex::Token assn_token_;
   LvalueExpression* lhs_;
   Expression* rhs_;
 };

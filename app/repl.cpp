@@ -21,7 +21,7 @@ int main() {
               lex::Token{lex::TokenType::IDENTIFIER, lex::Location{}, "str"}}}};
 
   auto* comp_stmt = new BlockExpression{
-      std::vector<Statement*>{str_decl, new ExprStatement{printf_call}}};
+      std::vector<Statement*>{str_decl, new ExprStatement{printf_call}}, nullptr};
 
   auto* fn_decl = new FunDeclStatement{
       lex::Token{lex::TokenType::IDENTIFIER, lex::Location{}, "aboba"},

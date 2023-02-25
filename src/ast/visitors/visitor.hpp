@@ -66,7 +66,7 @@ class Visitor {
   virtual void VisitLiteralExpression(LiteralExpression *expr) = 0;
   virtual void VisitVarAccessExpression(VarAccessExpression *expr) = 0;
 //  virtual void VisitTypecastExpression(TypecastExpression *expr) = 0;
-//  virtual void VisitYieldExpression(YieldExpression *expr) = 0;
+  virtual void VisitYieldExpression(YieldExpression *expr) = 0;
   virtual void VisitReturnExpression(ReturnExpression *expr) = 0;
 
   //////////////////////////////////////////////////////////////////////

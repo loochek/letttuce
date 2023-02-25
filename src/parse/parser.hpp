@@ -3,30 +3,22 @@
 #include <ast/declarations.hpp>
 
 #include <lex/lexer.hpp>
+#include <utility>
 
 class Parser {
  public:
-  Parser(lex::Lexer& l);
-
-  ///////////////////////////////////////////////////////////////////
-
+  explicit Parser(lex::Lexer& l);
 
   ///////////////////////////////////////////////////////////////////
 
   Statement* ParseStatement();
 
-  Statement* ParseExprStatement();
-  AssignmentStatement* ParseAssignment(LvalueExpression* target);
-
   ////////////////////////////////////////////////////////////////////
 
   Declaration* ParseDeclaration();
 
-  Declaration* ParsePrototype();
-  FunDeclStatement* ParseFunPrototype();
   FunDeclStatement* ParseFunDeclStatement();
   VarDeclStatement* ParseVarDeclStatement();
-  FunDeclStatement* ParseFunDeclarationStandalone();
 
   ////////////////////////////////////////////////////////////////////
 
@@ -34,46 +26,52 @@ class Parser {
 
   Expression* ParseKeywordExpresssion();
 
-  Expression* ParseReturnStatement();
-  Expression* ParseYieldStatement();
+  Expression* ParseReturnExpression();
+  Expression* ParseYieldExpression();
   Expression* ParseIfExpression();
-  Expression* ParseMatchExpression();
-  Expression* ParseNewExpression();
 
-  Expression* ParseBlockExpression();
+  Expression* ParseCompoundExpression();
 
-  Expression* ParseComparison();
-  Expression* ParseBinary();
-
-  Expression* ParseUnary();
-  Expression* ParseDeref();
-  Expression* ParseAddressof();
-
-  // Precedence 1
-  Expression* ParsePostfixExpressions();
-  Expression* ParseFieldAccess(Expression* expr);
-  Expression* ParseIndirectFieldAccess(Expression* expr);
-  Expression* ParseIndexingExpression(Expression* expr);
-  Expression* ParseFnCallUnnamed(Expression* expr);
-  Expression* ParseFnCallExpression(Expression* expr, lex::Token id);
-
-  Expression* ParseCompoundInitializer(lex::Token id);
-  Expression* ParseSignleFieldCompound();
-  Expression* ParsePrimary();
+  // Precedences
+  Expression* ParseEqualityExpression();
+  Expression* ParseRelationalExpression();
+  Expression* ParseAdditiveExpression();
+  Expression* ParseMultiplicativeExpression();
+  Expression* ParsePostfixExpression();
+  Expression* ParseUnaryExpression();
+  Expression* ParsePrimaryExpression();
 
   ////////////////////////////////////////////////////////////////////
+
+  template<Expression* (Parser::*InnerParser)(), lex::TokenType... Tokens>
+  Expression* ParseBinaryExpression() {
+    Expression *lhs = (this->*InnerParser)();
+
+    lex::Token operation = lexer_.Peek();
+    while ((Matches(Tokens) || ...)) {
+      lhs = new BinaryExpression(operation, lhs, (this->*InnerParser)());
+      operation = lexer_.Peek();
+    }
+
+    return lhs;
+  }
 
   ////////////////////////////////////////////////////////////////////
 
  private:
-  std::string FormatLocation();
+  std::string FormatLocation() {
+    return lexer_.Peek().location.Format();
+  }
 
-  auto ParseCSV() -> std::vector<Expression*>;
-  auto ParseFormals() -> std::vector<lex::Token>;
+  std::vector<lex::Token> ParseFunctionArgs();
 
-  bool Matches(lex::TokenType type);
+  bool Matches(lex::TokenType type) {
+    return lexer_.Matches(type);
+  }
+
   void Consume(lex::TokenType type);
-  bool MatchesComparisonSign(lex::TokenType type);
+  void ReportError(const std::string& message);
+  void Synchronize();
 
  private:
   lex::Lexer& lexer_;

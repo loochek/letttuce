@@ -77,6 +77,12 @@ class PrintVisitor : public Visitor {
     IdentBlock([&]() { expr->expr_->Accept(this); });
   }
 
+  void VisitYieldExpression(YieldExpression* expr) override {
+    INDENTED(fmt::print("Yield\n"));
+    INDENTED(fmt::print("Value (expression):\n"));
+    IdentBlock([&]() { expr->expr_->Accept(this); });
+  }
+
   void VisitExprStatement(ExprStatement* stmt) override {
     INDENTED(fmt::print("Expression statement\n"));
     IdentBlock([&]() { stmt->expr_->Accept(this); });

@@ -12,9 +12,7 @@ namespace lex {
 
 class Lexer {
  public:
-  Lexer(std::istream& source);
-
-  Token GetNextToken();
+  explicit Lexer(std::istream& source);
 
   void Advance();
 
@@ -26,6 +24,8 @@ class Lexer {
   bool Matches(lex::TokenType type);
 
  private:
+  Token GetNextToken();
+
   void SkipWhitespace();
 
   void SkipComments();
