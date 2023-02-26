@@ -109,9 +109,8 @@ class FnCallExpression : public Expression {
 
 class BlockExpression : public Expression {
  public:
-  explicit BlockExpression(std::vector<Statement*> statements,
-                           Expression* tail_expr)
-      : statements_{std::move(statements)}, tail_expr_(tail_expr) {
+  explicit BlockExpression(std::vector<Statement*> statements)
+      : statements_{std::move(statements)} {
   }
 
   void Accept(Visitor* visitor) override {
@@ -124,7 +123,6 @@ class BlockExpression : public Expression {
   }
 
   std::vector<Statement*> statements_;
-  Expression* tail_expr_;
 };
 
 //////////////////////////////////////////////////////////////////////

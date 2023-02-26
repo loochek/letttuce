@@ -24,7 +24,9 @@ FunDeclStatement* Parser::ParseFunDeclStatement() {
 
   lex::Token fun_name = lexer_.Peek();
   Consume(lex::TokenType::IDENTIFIER);
+  Consume(lex::TokenType::LEFT_BRACE);
   auto args = ParseFunctionArgs();
+  Consume(lex::TokenType::RIGHT_BRACE);
   Consume(lex::TokenType::ASSIGN);
   Expression* body = ParseExpression();
   Consume(lex::TokenType::SEMICOLON);

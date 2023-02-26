@@ -83,13 +83,13 @@ inline const char* FormatTokenType(TokenType type) {
       return "<";
     case TokenType::GT:
       return ">";
-    case TokenType::LEFT_BRACE:
-      return "{";
-    case TokenType::RIGHT_BRACE:
-      return "}";
     case TokenType::LEFT_CBRACE:
-      return "(";
+      return "{";
     case TokenType::RIGHT_CBRACE:
+      return "}";
+    case TokenType::LEFT_BRACE:
+      return "(";
+    case TokenType::RIGHT_BRACE:
       return ")";
     case TokenType::COMMA:
       return ",";

@@ -40,7 +40,7 @@ Expression* Parser::ParseIfExpression() {
   Expression *then_expr = ParseExpression();
 
   Expression *else_expr = nullptr;
-  if (!Matches(lex::TokenType::ELSE))  {
+  if (Matches(lex::TokenType::ELSE))  {
     else_expr = ParseExpression();
   }
 
@@ -49,41 +49,26 @@ Expression* Parser::ParseIfExpression() {
 ////////////////////////////////////////////////////////////////////
 
 Expression* Parser::ParseCompoundExpression() {
-  if (!Matches(lex::TokenType::LEFT_BRACE)) {
+  if (!Matches(lex::TokenType::LEFT_CBRACE)) {
     return nullptr;
   }
 
   std::vector<Statement*> statements;
-  bool consumed = true;
-  while (consumed) {
-    consumed = false;
+  while (!lexer_.Matches(lex::TokenType::RIGHT_CBRACE)) {
     try {
       Declaration* decl = ParseDeclaration();
       if (decl != nullptr) {
         statements.push_back(decl);
-        consumed = true;
-      }
-
-      Statement* stmt = ParseStatement();
-      if (stmt != nullptr) {
-        statements.push_back(stmt);
-        consumed = true;
+      } else {
+        statements.push_back(ParseStatement());
       }
     } catch (parse::errors::ParseError& error) {
       ReportError(error.message);
       Synchronize();
     }
-
-    if (!consumed) {
-      break;
-    }
   }
 
-  // Try to match tail expression
-  Expression* tail_expr = ParseExpression();
-
-  Consume(lex::TokenType::RIGHT_BRACE);
-  return new BlockExpression(std::move(statements), tail_expr);
+  return new BlockExpression(std::move(statements));
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -138,7 +123,7 @@ Expression* Parser::ParsePostfixExpression() {
 //
 //  // Function call branch
 //
-//  if (Matches(lex::TokenType::RIGHT_CBRACE)) {
+//  if (Matches(lex::TokenType::RIGHT_BRACE)) {
 //    // No arguments
 //    return new FnCallExpression(lhs, std::vector<Expression*>{});
 //  }
@@ -147,7 +132,7 @@ Expression* Parser::ParsePostfixExpression() {
 //
 //  // First argument
 //  args.push_back(ParseExpression());
-//  while (!Matches(lex::TokenType::RIGHT_CBRACE)) {
+//  while (!Matches(lex::TokenType::RIGHT_BRACE)) {
 //    Consume(lex::TokenType::COMMA);
 //    args.push_back(ParseExpression());
 //  }
@@ -160,9 +145,9 @@ Expression* Parser::ParsePostfixExpression() {
 Expression* Parser::ParsePrimaryExpression() {
   // Try parsing grouping first
 
-  if (Matches(lex::TokenType::LEFT_CBRACE)) {
+  if (Matches(lex::TokenType::LEFT_BRACE)) {
     Expression *expr = ParseExpression();
-    Consume(lex::TokenType::RIGHT_CBRACE);
+    Consume(lex::TokenType::RIGHT_BRACE);
     return expr;
   }
 

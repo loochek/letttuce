@@ -47,10 +47,9 @@ class Parser {
   Expression* ParseBinaryExpression() {
     Expression *lhs = (this->*InnerParser)();
 
-    lex::Token operation = lexer_.Peek();
     while ((Matches(Tokens) || ...)) {
+      lex::Token operation = lexer_.GetPreviousToken();
       lhs = new BinaryExpression(operation, lhs, (this->*InnerParser)());
-      operation = lexer_.Peek();
     }
 
     return lhs;
