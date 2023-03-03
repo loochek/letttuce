@@ -10,9 +10,14 @@ void Parser::Consume(lex::TokenType type) {
   }
 }
 
-void Parser::ReportError(const std::string& message) {
+void Parser::ReportError(const parse::errors::ParseError& error) {
   // TODO: normal error printing
-  fmt::print("Error at {}: {}\n", lexer_.Peek().location.Format(), message);
+  if (dynamic_cast<const parse::errors::ParseCompoundError*>(&error) != nullptr) {
+    // ew
+    return;
+  }
+
+  fmt::print("Error: {}\n", error.what());
 }
 
 void Parser::Synchronize() {

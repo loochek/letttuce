@@ -3,6 +3,33 @@
 
 ///////////////////////////////////////////////////////////////////
 
+Program* Parser::ParseProgram() {
+  bool errors_occured = false;
+  std::vector<Declaration*> decls;
+  while (!lexer_.Matches(lex::TokenType::TOKEN_EOF)) {
+    try {
+      Declaration* decl = ParseDeclaration();
+      if (decl == nullptr) {
+        throw parse::errors::ParseDeclarationError((lexer_.Peek().location.Format()));
+      }
+
+      decls.push_back(decl);
+    } catch (parse::errors::ParseError& error) {
+      ReportError(error);
+      Synchronize();
+      errors_occured = true;
+    }
+  }
+
+  if (errors_occured) {
+    throw parse::errors::ParseProgramError();
+  }
+
+  return new Program(std::move(decls));
+}
+
+///////////////////////////////////////////////////////////////////
+
 Declaration* Parser::ParseDeclaration() {
   if (auto var_declaration = ParseVarDeclStatement()) {
     return var_declaration;
@@ -40,6 +67,9 @@ std::vector<lex::Token> Parser::ParseFunctionArgs() {
 
   while (Matches(lex::TokenType::IDENTIFIER)) {
     args.push_back(lexer_.GetPreviousToken());
+    if (!Matches(lex::TokenType::COMMA)) {
+      break;
+    }
   }
 
   return args;

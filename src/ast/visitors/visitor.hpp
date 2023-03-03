@@ -2,6 +2,10 @@
 
 //////////////////////////////////////////////////////////////////////
 
+class Program;
+
+//////////////////////////////////////////////////////////////////////
+
 class Expression;
 class ComparisonExpression;
 class BinaryExpression;
@@ -49,6 +53,8 @@ class TraitDeclaration;
 class Visitor {
  public:
   virtual ~Visitor() = default;
+
+  virtual void VisitProgram(Program *prg) = 0;
 
   virtual void VisitComparisonExpression(ComparisonExpression *expr) = 0;
   virtual void VisitBinaryExpression(BinaryExpression *expr) = 0;

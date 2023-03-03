@@ -17,8 +17,7 @@ struct Location {
   }
 
   std::string Format() const {
-    return fmt::format("line = {}, column = {}, abs = {}",  //
-                       lineno + 1, columnno + 1, abs_pos);
+    return fmt::format("line {}, column {}",  lineno + 1, columnno + 1);
   }
 };
 }  // namespace lex

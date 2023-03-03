@@ -235,7 +235,9 @@ std::optional<Token> Lexer::MatchWords() {
   scanner_.MoveNext();
   MoveNextWhileCond([&]() {
     return isalpha(scanner_.CurrentSymbol()) ||
-           isdigit(scanner_.CurrentSymbol());
+           isdigit(scanner_.CurrentSymbol()) ||
+           scanner_.CurrentSymbol() == '_' ||
+           scanner_.CurrentSymbol() == '-';
   });
 
   Location end_loc = scanner_.GetLocation();

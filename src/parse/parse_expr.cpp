@@ -53,6 +53,9 @@ Expression* Parser::ParseCompoundExpression() {
     return nullptr;
   }
 
+  lex::Token compound_start_token = lexer_.GetPreviousToken();
+
+  bool errors_occured = false;
   std::vector<Statement*> statements;
   while (!lexer_.Matches(lex::TokenType::RIGHT_CBRACE)) {
     try {
@@ -63,9 +66,14 @@ Expression* Parser::ParseCompoundExpression() {
         statements.push_back(ParseStatement());
       }
     } catch (parse::errors::ParseError& error) {
-      ReportError(error.message);
+      ReportError(error);
       Synchronize();
+      errors_occured = true;
     }
+  }
+
+  if (errors_occured) {
+    throw parse::errors::ParseCompoundError(compound_start_token.location.Format());
   }
 
   return new BlockExpression(std::move(statements));
@@ -110,34 +118,27 @@ Expression* Parser::ParseUnaryExpression() {
 ////////////////////////////////////////////////////////////////////
 
 Expression* Parser::ParsePostfixExpression() {
-  return ParsePrimaryExpression();
-  // TODO: multiple calls?
-  // TODO: fix
+  Expression* callable = ParsePrimaryExpression();
 
-//  lex::Token fn_name = lexer_.Peek();
-//  if (!Matches(lex::TokenType::IDENTIFIER)) {
-//    return ParseExpression();
-//  } else {
-//
-//  }
-//
-//  // Function call branch
-//
-//  if (Matches(lex::TokenType::RIGHT_BRACE)) {
-//    // No arguments
-//    return new FnCallExpression(lhs, std::vector<Expression*>{});
-//  }
-//
-//  std::vector<Expression*> args;
-//
-//  // First argument
-//  args.push_back(ParseExpression());
-//  while (!Matches(lex::TokenType::RIGHT_BRACE)) {
-//    Consume(lex::TokenType::COMMA);
-//    args.push_back(ParseExpression());
-//  }
-//
-//  return new FnCallExpression(lhs, std::move(args));
+  while (Matches(lex::TokenType::LEFT_BRACE)) {
+    if (Matches(lex::TokenType::RIGHT_BRACE)) {
+      // No arguments
+      callable = new FnCallExpression(callable, std::vector<Expression*>{});
+      continue;
+    }
+
+    std::vector<Expression*> args;
+    // First argument
+    args.push_back(ParseExpression());
+    while (!Matches(lex::TokenType::RIGHT_BRACE)) {
+      Consume(lex::TokenType::COMMA);
+      args.push_back(ParseExpression());
+    }
+
+    callable = new FnCallExpression(callable, std::move(args));
+  }
+
+  return callable;
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -17,6 +17,25 @@ class Declaration : public Statement {
 
 //////////////////////////////////////////////////////////////////////
 
+class Program : public TreeNode {
+ public:
+  void Accept(Visitor* visitor) override {
+    visitor->VisitProgram(this);
+  }
+
+  explicit Program(std::vector<Declaration*> decls)
+      : decls_{std::move(decls)} {
+  }
+
+  lex::Location GetLocation() override {
+    return lex::Location{};
+  }
+
+  std::vector<Declaration*> decls_;
+};
+
+//////////////////////////////////////////////////////////////////////
+
 class VarDeclStatement : public Declaration {
  public:
   VarDeclStatement(lex::Token name, Expression* expr)

@@ -89,8 +89,8 @@ class UnaryExpression : public Expression {
 
 class FnCallExpression : public Expression {
  public:
-  FnCallExpression(lex::Token fn_name, std::vector<Expression*> args)
-      : fn_name_{fn_name}, args_{std::move(args)} {
+  FnCallExpression(Expression* callable, std::vector<Expression*> args)
+      : callable_{callable}, args_{std::move(args)} {
   }
 
   void Accept(Visitor* visitor) override {
@@ -98,10 +98,10 @@ class FnCallExpression : public Expression {
   }
 
   lex::Location GetLocation() override {
-    return fn_name_.location;
+    return callable_->GetLocation();
   }
 
-  lex::Token fn_name_;
+  Expression* callable_;
   std::vector<Expression*> args_;
 };
 

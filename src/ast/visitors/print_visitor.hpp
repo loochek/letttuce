@@ -15,6 +15,14 @@ class PrintVisitor : public Visitor {
     curr_tabs_--;
   }
 
+  void VisitProgram(Program* prg) override  {
+    INDENTED(fmt::print("Program\n"));
+    for (size_t i = 0; i < prg->decls_.size(); i++) {
+      INDENTED(fmt::print("Declaration {}:\n", i));
+      IdentBlock([&]() { prg->decls_[i]->Accept(this); });
+    }
+  }
+
   void VisitComparisonExpression(ComparisonExpression* expr) override {
     INDENTED(fmt::print("Comparison: {}\n", lex::FormatTokenType(expr->operation_.type)));
     INDENTED(fmt::print("LHS:\n"));
@@ -58,7 +66,9 @@ class PrintVisitor : public Visitor {
   }
 
   void VisitFnCallExpression(FnCallExpression* expr) override {
-    INDENTED(fmt::print("Function call: \n", expr->fn_name_.GetIdentifier()));
+    INDENTED(fmt::print("Function call\n"));
+    INDENTED(fmt::print("Callable:\n"));
+    IdentBlock([&]() { expr->callable_->Accept(this); });
     for (size_t i = 0; i < expr->args_.size(); i++)  {
       INDENTED(fmt::print("Arg {}:\n", i));
       IdentBlock([&]() { expr->args_[i]->Accept(this); });

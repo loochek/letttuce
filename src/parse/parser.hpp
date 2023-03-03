@@ -1,13 +1,15 @@
 #pragma once
 
 #include <ast/declarations.hpp>
-
+#include <parse/parse_error.hpp>
 #include <lex/lexer.hpp>
 #include <utility>
 
 class Parser {
  public:
   explicit Parser(lex::Lexer& l);
+
+  Program* ParseProgram();
 
   ///////////////////////////////////////////////////////////////////
 
@@ -69,7 +71,9 @@ class Parser {
   }
 
   void Consume(lex::TokenType type);
-  void ReportError(const std::string& message);
+  void ReportError(const parse::errors::ParseError& error);
+
+  /// Skips tokens until semicolon or EOF is encountered
   void Synchronize();
 
  private:
