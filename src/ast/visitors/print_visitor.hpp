@@ -3,7 +3,10 @@
 #include <fmt/core.h>
 #include <ast/visitors/visitor.hpp>
 #include <ast/expressions.hpp>
+#include <ast/statements.hpp>
+#include <ast/declarations.hpp>
 
+namespace ast {
 #define INDENTED(stmt) { indent(); stmt; }
 
 class PrintVisitor : public Visitor {
@@ -15,7 +18,7 @@ class PrintVisitor : public Visitor {
     curr_tabs_--;
   }
 
-  void VisitProgram(Program* prg) override  {
+  void VisitProgram(ast::Program* prg) override  {
     INDENTED(fmt::print("Program\n"));
     for (size_t i = 0; i < prg->decls_.size(); i++) {
       INDENTED(fmt::print("Declaration {}:\n", i));
@@ -23,7 +26,7 @@ class PrintVisitor : public Visitor {
     }
   }
 
-  void VisitComparisonExpression(ComparisonExpression* expr) override {
+  void VisitComparisonExpression(ast::ComparisonExpression* expr) override {
     INDENTED(fmt::print("Comparison: {}\n", lex::FormatTokenType(expr->operation_.type)));
     INDENTED(fmt::print("LHS:\n"));
     IdentBlock([&]() { expr->lhs_->Accept(this); });
@@ -31,7 +34,7 @@ class PrintVisitor : public Visitor {
     IdentBlock([&]() { expr->rhs_->Accept(this); });
   }
 
-  void VisitBinaryExpression(BinaryExpression* expr) override {
+  void VisitBinaryExpression(ast::BinaryExpression* expr) override {
     INDENTED(fmt::print("Binary expression: {}\n", lex::FormatTokenType(expr->operation_.type)));
     INDENTED(fmt::print("LHS:\n"));
     IdentBlock([&]() { expr->lhs_->Accept(this); });
@@ -39,13 +42,13 @@ class PrintVisitor : public Visitor {
     IdentBlock([&]() { expr->rhs_->Accept(this); });
   }
 
-  void VisitUnaryExpression(UnaryExpression* expr) override {
+  void VisitUnaryExpression(ast::UnaryExpression* expr) override {
     INDENTED(fmt::print("Unary expression: {}\n", lex::FormatTokenType(expr->operation_.type)));
     INDENTED(fmt::print("Expression:\n"));
     IdentBlock([&]() { expr->expr_->Accept(this); });
   }
 
-  void VisitIfExpression(IfExpression* expr) override {
+  void VisitIfExpression(ast::IfExpression* expr) override {
     INDENTED(fmt::print("If\n"));
     INDENTED(fmt::print("Condition:\n"));
     IdentBlock([&]() { expr->condition_->Accept(this); });
@@ -57,7 +60,7 @@ class PrintVisitor : public Visitor {
     }
   }
 
-  void VisitBlockExpression(BlockExpression* expr) override {
+  void VisitBlockExpression(ast::BlockExpression* expr) override {
     INDENTED(fmt::print("Block expression\n"));
     for (size_t i = 0; i < expr->statements_.size(); i++) {
       INDENTED(fmt::print("Statement {}:\n", i));
@@ -65,7 +68,7 @@ class PrintVisitor : public Visitor {
     }
   }
 
-  void VisitFnCallExpression(FnCallExpression* expr) override {
+  void VisitFnCallExpression(ast::FnCallExpression* expr) override {
     INDENTED(fmt::print("Function call\n"));
     INDENTED(fmt::print("Callable:\n"));
     IdentBlock([&]() { expr->callable_->Accept(this); });
@@ -75,32 +78,32 @@ class PrintVisitor : public Visitor {
     }
   }
 
-  void VisitLiteralExpression(LiteralExpression* expr) override {
+  void VisitLiteralExpression(ast::LiteralExpression* expr) override {
     INDENTED(fmt::print("Literal expression: {}\n", std::string{expr->literal_}));
   }
 
-  void VisitVarAccessExpression(VarAccessExpression* expr) override {
+  void VisitVarAccessExpression(ast::VarAccessExpression* expr) override {
     INDENTED(fmt::print("Var access: {}\n", expr->name_.GetIdentifier()));
   }
 
-  void VisitReturnExpression(ReturnExpression* expr) override {
+  void VisitReturnExpression(ast::ReturnExpression* expr) override {
     INDENTED(fmt::print("Return\n"));
     INDENTED(fmt::print("Value (expression):\n"));
     IdentBlock([&]() { expr->expr_->Accept(this); });
   }
 
-  void VisitYieldExpression(YieldExpression* expr) override {
+  void VisitYieldExpression(ast::YieldExpression* expr) override {
     INDENTED(fmt::print("Yield\n"));
     INDENTED(fmt::print("Value (expression):\n"));
     IdentBlock([&]() { expr->expr_->Accept(this); });
   }
 
-  void VisitExprStatement(ExprStatement* stmt) override {
+  void VisitExprStatement(ast::ExprStatement* stmt) override {
     INDENTED(fmt::print("Expression statement\n"));
     IdentBlock([&]() { stmt->expr_->Accept(this); });
   }
 
-  void VisitAssignmentStatement(AssignmentStatement* stmt) override {
+  void VisitAssignmentStatement(ast::AssignmentStatement* stmt) override {
     INDENTED(fmt::print("Assignment\n"));
     INDENTED(fmt::print("Lvalue:\n"));
     IdentBlock([&]() { stmt->lhs_->Accept(this); });
@@ -108,13 +111,13 @@ class PrintVisitor : public Visitor {
     IdentBlock([&]() { stmt->rhs_->Accept(this); });
   }
 
-  void VisitVarDeclaration(VarDeclStatement* decl) override {
+  void VisitVarDeclaration(ast::VarDeclStatement* decl) override {
     INDENTED(fmt::print("Variable declaration: {}\n", decl->GetName()));
     INDENTED(fmt::print("Initializer:\n"));
     IdentBlock([&]() { decl->expr_->Accept(this); });
   }
 
-  void VisitFunDeclaration(FunDeclStatement* decl) override {
+  void VisitFunDeclaration(ast::FunDeclStatement* decl) override {
     INDENTED(fmt::print("Function declaration: {}\n", decl->GetName()));
 
     INDENTED(fmt::print("Params: "));
@@ -138,3 +141,4 @@ class PrintVisitor : public Visitor {
  private:
   size_t curr_tabs_ = 0;
 };
+}

@@ -1,10 +1,11 @@
 #pragma once
 
 #include <ast/visitors/visitor.hpp>
-
 #include <lex/location.hpp>
 
 //////////////////////////////////////////////////////////////////////
+
+namespace ast {
 
 class TreeNode {
  public:
@@ -19,5 +20,6 @@ class TreeNode {
     return dynamic_cast<T*>(this);
   }
 };
+}  // namespace ast
 
 //////////////////////////////////////////////////////////////////////

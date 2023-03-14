@@ -3,18 +3,18 @@
 
 ///////////////////////////////////////////////////////////////////
 
-Statement* Parser::ParseStatement() {
-  Expression* expr = ParseExpression();
+ast::Statement* parse::Parser::ParseStatement() {
+  ast::Expression* expr = ParseExpression();
 
   if (Matches(lex::TokenType::ASSIGN)) {
     // Assignment statement
     lex::Token assn_token = lexer_.GetPreviousToken();
-    Expression* value = ParseExpression();
+    ast::Expression* value = ParseExpression();
     Consume(lex::TokenType::SEMICOLON);
-    return new AssignmentStatement(assn_token, expr->as<LvalueExpression>(), value);
+    return new ast::AssignmentStatement(assn_token, expr->as<ast::LvalueExpression>(), value);
   }
 
   // Expression statement
   Consume(lex::TokenType::SEMICOLON);
-  return new ExprStatement(expr);
+  return new ast::ExprStatement(expr);
 }

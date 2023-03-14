@@ -1,13 +1,14 @@
 #pragma once
 
+#include <ast/visitors/visitor.hpp>
 #include <ast/syntax_tree.hpp>
-
 #include <lex/token.hpp>
-
 #include <utility>
 #include <vector>
 
 //////////////////////////////////////////////////////////////////////
+
+namespace ast {
 
 class Expression : public TreeNode {
  public:
@@ -15,13 +16,8 @@ class Expression : public TreeNode {
   // virtual types::Type* GetType() = 0;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 // Assignable entity
-
 class LvalueExpression : public Expression {};
-
-//////////////////////////////////////////////////////////////////////
 
 class ComparisonExpression : public Expression {
  public:
@@ -42,10 +38,6 @@ class ComparisonExpression : public Expression {
   Expression* rhs_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
-// Binary arithmetic: + - / *
-
 class BinaryExpression : public Expression {
  public:
   BinaryExpression(lex::Token operation, Expression* lhs, Expression* rhs)
@@ -65,8 +57,6 @@ class BinaryExpression : public Expression {
   Expression* rhs_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class UnaryExpression : public Expression {
  public:
   UnaryExpression(lex::Token operation, Expression* expr)
@@ -85,8 +75,6 @@ class UnaryExpression : public Expression {
   Expression* expr_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class FnCallExpression : public Expression {
  public:
   FnCallExpression(Expression* callable, std::vector<Expression*> args)
@@ -104,9 +92,6 @@ class FnCallExpression : public Expression {
   Expression* callable_;
   std::vector<Expression*> args_;
 };
-
-//////////////////////////////////////////////////////////////////////
-
 class BlockExpression : public Expression {
  public:
   explicit BlockExpression(std::vector<Statement*> statements)
@@ -124,8 +109,6 @@ class BlockExpression : public Expression {
 
   std::vector<Statement*> statements_;
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class IfExpression : public Expression {
  public:
@@ -151,8 +134,6 @@ class IfExpression : public Expression {
   Expression* else_branch_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class LiteralExpression : public Expression {
  public:
   explicit LiteralExpression(lex::Token literal) : literal_{literal} {
@@ -169,8 +150,6 @@ class LiteralExpression : public Expression {
   lex::Token literal_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class VarAccessExpression : public LvalueExpression {
  public:
   explicit VarAccessExpression(lex::Token name) : name_{name} {
@@ -186,8 +165,6 @@ class VarAccessExpression : public LvalueExpression {
 
   lex::Token name_;
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class ReturnExpression : public Expression {
  public:
@@ -207,8 +184,6 @@ class ReturnExpression : public Expression {
   Expression* expr_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class YieldExpression : public Expression {
  public:
   explicit YieldExpression(lex::Token yield_token, Expression* expr)
@@ -227,4 +202,4 @@ class YieldExpression : public Expression {
   Expression* expr_;
 };
 
-//////////////////////////////////////////////////////////////////////
+}  // namespace ast

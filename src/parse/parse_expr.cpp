@@ -3,13 +3,13 @@
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseExpression() {
+ast::Expression* parse::Parser::ParseExpression() {
   return ParseEqualityExpression();
 }
 
 ///////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseKeywordExpresssion() {
+ast::Expression* parse::Parser::ParseKeywordExpresssion() {
   if (auto return_expr = ParseReturnExpression()) {
     return return_expr;
   }
@@ -27,28 +27,28 @@ Expression* Parser::ParseKeywordExpresssion() {
 
 ///////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseIfExpression() {
+ast::Expression* parse::Parser::ParseIfExpression() {
   if (!Matches(lex::TokenType::IF))  {
     return nullptr;
   }
 
   lex::Token if_token = lexer_.GetPreviousToken();
 
-  Expression *condition = ParseExpression();
+  ast::Expression *condition = ParseExpression();
 
   Consume(lex::TokenType::THEN);
-  Expression *then_expr = ParseExpression();
+  ast::Expression *then_expr = ParseExpression();
 
-  Expression *else_expr = nullptr;
+  ast::Expression *else_expr = nullptr;
   if (Matches(lex::TokenType::ELSE))  {
     else_expr = ParseExpression();
   }
 
-  return new IfExpression(if_token, condition, then_expr, else_expr);
+  return new ast::IfExpression(if_token, condition, then_expr, else_expr);
 }
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseCompoundExpression() {
+ast::Expression* parse::Parser::ParseCompoundExpression() {
   if (!Matches(lex::TokenType::LEFT_CBRACE)) {
     return nullptr;
   }
@@ -56,10 +56,10 @@ Expression* Parser::ParseCompoundExpression() {
   lex::Token compound_start_token = lexer_.GetPreviousToken();
 
   bool errors_occured = false;
-  std::vector<Statement*> statements;
+  std::vector<ast::Statement*> statements;
   while (!lexer_.Matches(lex::TokenType::RIGHT_CBRACE)) {
     try {
-      Declaration* decl = ParseDeclaration();
+      ast::Declaration* decl = ParseDeclaration();
       if (decl != nullptr) {
         statements.push_back(decl);
       } else {
@@ -76,40 +76,40 @@ Expression* Parser::ParseCompoundExpression() {
     throw parse::errors::ParseCompoundError(compound_start_token.location.Format());
   }
 
-  return new BlockExpression(std::move(statements));
+  return new ast::BlockExpression(std::move(statements));
 }
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseEqualityExpression() {
+ast::Expression* parse::Parser::ParseEqualityExpression() {
   return ParseBinaryExpression<&Parser::ParseRelationalExpression, lex::TokenType::EQUALS, lex::TokenType::NOT_EQ>();
 }
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseRelationalExpression() {
+ast::Expression* parse::Parser::ParseRelationalExpression() {
   return ParseBinaryExpression<&Parser::ParseAdditiveExpression, lex::TokenType::LT, lex::TokenType::GT>();
 }
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseAdditiveExpression() {
+ast::Expression* parse::Parser::ParseAdditiveExpression() {
   return ParseBinaryExpression<&Parser::ParseMultiplicativeExpression, lex::TokenType::PLUS, lex::TokenType::MINUS>();
 }
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseMultiplicativeExpression() {
-  return ParseBinaryExpression<&Parser::ParseUnaryExpression, lex::TokenType::STAR, lex::TokenType::DIV>();
+ast::Expression* parse::Parser::ParseMultiplicativeExpression() {
+  return ParseBinaryExpression<&parse::Parser::ParseUnaryExpression, lex::TokenType::STAR, lex::TokenType::DIV>();
 }
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseUnaryExpression() {
+ast::Expression* parse::Parser::ParseUnaryExpression() {
   lex::Token token = lexer_.Peek();
   if (Matches(lex::TokenType::MINUS) || Matches(lex::TokenType::NOT)) {
-    Expression* expr = ParseUnaryExpression();
-    return new UnaryExpression(token, expr);
+    ast::Expression* expr = ParseUnaryExpression();
+    return new ast::UnaryExpression(token, expr);
   }
 
   return ParsePostfixExpression();
@@ -117,17 +117,17 @@ Expression* Parser::ParseUnaryExpression() {
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParsePostfixExpression() {
-  Expression* callable = ParsePrimaryExpression();
+ast::Expression* parse::Parser::ParsePostfixExpression() {
+  ast::Expression* callable = ParsePrimaryExpression();
 
   while (Matches(lex::TokenType::LEFT_BRACE)) {
     if (Matches(lex::TokenType::RIGHT_BRACE)) {
       // No arguments
-      callable = new FnCallExpression(callable, std::vector<Expression*>{});
+      callable = new ast::FnCallExpression(callable, std::vector<ast::Expression*>{});
       continue;
     }
 
-    std::vector<Expression*> args;
+    std::vector<ast::Expression*> args;
     // First argument
     args.push_back(ParseExpression());
     while (!Matches(lex::TokenType::RIGHT_BRACE)) {
@@ -135,7 +135,7 @@ Expression* Parser::ParsePostfixExpression() {
       args.push_back(ParseExpression());
     }
 
-    callable = new FnCallExpression(callable, std::move(args));
+    callable = new ast::FnCallExpression(callable, std::move(args));
   }
 
   return callable;
@@ -143,11 +143,11 @@ Expression* Parser::ParsePostfixExpression() {
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParsePrimaryExpression() {
+ast::Expression* parse::Parser::ParsePrimaryExpression() {
   // Try parsing grouping first
 
   if (Matches(lex::TokenType::LEFT_BRACE)) {
-    Expression *expr = ParseExpression();
+    ast::Expression *expr = ParseExpression();
     Consume(lex::TokenType::RIGHT_BRACE);
     return expr;
   }
@@ -170,7 +170,7 @@ Expression* Parser::ParsePrimaryExpression() {
     case lex::TokenType::TRUE:
     case lex::TokenType::FALSE:
       lexer_.Advance();
-      return new LiteralExpression(curr_token);
+      return new ast::LiteralExpression(curr_token);
 
     default:
       throw parse::errors::ParsePrimaryError(curr_token.location.Format());
@@ -181,28 +181,28 @@ Expression* Parser::ParsePrimaryExpression() {
 
 ////////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseReturnExpression() {
+ast::Expression* parse::Parser::ParseReturnExpression() {
   if (!Matches(lex::TokenType::RETURN)) {
     return nullptr;
   }
 
   lex::Token return_token = lexer_.GetPreviousToken();
 
-  Expression* expr = ParseExpression();
-  return new ReturnExpression(return_token, expr);
+  ast::Expression* expr = ParseExpression();
+  return new ast::ReturnExpression(return_token, expr);
 }
 
 ///////////////////////////////////////////////////////////////////
 
-Expression* Parser::ParseYieldExpression() {
+ast::Expression* parse::Parser::ParseYieldExpression() {
   if (!Matches(lex::TokenType::YIELD)) {
     return nullptr;
   }
 
   lex::Token yield_token = lexer_.GetPreviousToken();
 
-  Expression* expr = ParseExpression();
-  return new YieldExpression(yield_token, expr);
+  ast::Expression* expr = ParseExpression();
+  return new ast::YieldExpression(yield_token, expr);
 }
 
 ///////////////////////////////////////////////////////////////////

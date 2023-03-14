@@ -5,53 +5,54 @@
 #include <lex/lexer.hpp>
 #include <utility>
 
+namespace parse {
 class Parser {
  public:
   explicit Parser(lex::Lexer& l);
 
-  Program* ParseProgram();
+  ast::Program* ParseProgram();
 
   ///////////////////////////////////////////////////////////////////
 
-  Statement* ParseStatement();
+  ast::Statement* ParseStatement();
 
   ////////////////////////////////////////////////////////////////////
 
-  Declaration* ParseDeclaration();
+  ast::Declaration* ParseDeclaration();
 
-  FunDeclStatement* ParseFunDeclStatement();
-  VarDeclStatement* ParseVarDeclStatement();
+  ast::FunDeclStatement* ParseFunDeclStatement();
+  ast::VarDeclStatement* ParseVarDeclStatement();
 
   ////////////////////////////////////////////////////////////////////
 
-  Expression* ParseExpression();
+  ast::Expression* ParseExpression();
 
-  Expression* ParseKeywordExpresssion();
+  ast::Expression* ParseKeywordExpresssion();
 
-  Expression* ParseReturnExpression();
-  Expression* ParseYieldExpression();
-  Expression* ParseIfExpression();
+  ast::Expression* ParseReturnExpression();
+  ast::Expression* ParseYieldExpression();
+  ast::Expression* ParseIfExpression();
 
-  Expression* ParseCompoundExpression();
+  ast::Expression* ParseCompoundExpression();
 
   // Precedences
-  Expression* ParseEqualityExpression();
-  Expression* ParseRelationalExpression();
-  Expression* ParseAdditiveExpression();
-  Expression* ParseMultiplicativeExpression();
-  Expression* ParsePostfixExpression();
-  Expression* ParseUnaryExpression();
-  Expression* ParsePrimaryExpression();
+  ast::Expression* ParseEqualityExpression();
+  ast::Expression* ParseRelationalExpression();
+  ast::Expression* ParseAdditiveExpression();
+  ast::Expression* ParseMultiplicativeExpression();
+  ast::Expression* ParsePostfixExpression();
+  ast::Expression* ParseUnaryExpression();
+  ast::Expression* ParsePrimaryExpression();
 
   ////////////////////////////////////////////////////////////////////
 
-  template<Expression* (Parser::*InnerParser)(), lex::TokenType... Tokens>
-  Expression* ParseBinaryExpression() {
-    Expression *lhs = (this->*InnerParser)();
+  template<ast::Expression* (Parser::*InnerParser)(), lex::TokenType... Tokens>
+  ast::Expression* ParseBinaryExpression() {
+    ast::Expression *lhs = (this->*InnerParser)();
 
     while ((Matches(Tokens) || ...)) {
       lex::Token operation = lexer_.GetPreviousToken();
-      lhs = new BinaryExpression(operation, lhs, (this->*InnerParser)());
+      lhs = new ast::BinaryExpression(operation, lhs, (this->*InnerParser)());
     }
 
     return lhs;
@@ -64,14 +65,14 @@ class Parser {
     return lexer_.Peek().location.Format();
   }
 
-  std::vector<lex::Token> ParseFunctionArgs();
+  std::__1::vector<lex::Token> ParseFunctionArgs();
 
   bool Matches(lex::TokenType type) {
     return lexer_.Matches(type);
   }
 
   void Consume(lex::TokenType type);
-  void ReportError(const parse::errors::ParseError& error);
+  void ReportError(const errors::ParseError& error);
 
   /// Skips tokens until semicolon or EOF is encountered
   void Synchronize();
@@ -79,3 +80,4 @@ class Parser {
  private:
   lex::Lexer& lexer_;
 };
+}  // namespace parse

@@ -6,15 +6,17 @@
 #include <lex/token.hpp>
 
 #include <vector>
+#include "syntax_tree.hpp"
+#include "expressions.hpp"
 
 //////////////////////////////////////////////////////////////////////
 
-class Statement : public TreeNode {
+namespace ast {
+
+class Statement : public ast::TreeNode {
  public:
   void Accept(Visitor* /* visitor */) override{};
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class ExprStatement : public Statement {
  public:
@@ -31,8 +33,6 @@ class ExprStatement : public Statement {
 
   Expression* expr_;
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class AssignmentStatement : public Statement {
  public:
@@ -53,5 +53,4 @@ class AssignmentStatement : public Statement {
   LvalueExpression* lhs_;
   Expression* rhs_;
 };
-
-//////////////////////////////////////////////////////////////////////
+}  // namespace ast

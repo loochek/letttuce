@@ -32,10 +32,10 @@ TEST_CASE("Parser: just works", "[parse]") {
       "\t\tLiteral expression: 7\n";
 
   lex::Lexer lexer(expr);
-  Parser parser(lexer);
-  Statement* stmt = parser.ParseStatement();
+  parse::Parser parser(lexer);
+  ast::Statement* stmt = parser.ParseStatement();
 
-  SerializeVisitor serializer;
+  ast::SerializeVisitor serializer;
   stmt->Accept(&serializer);
 
   CHECK(serializer.GetSerializedString() == expected_output);
@@ -99,10 +99,10 @@ TEST_CASE("Parser: complex test", "[parse]") {
       "\t\t\t\t\tLiteral expression: 7\n";
 
   lex::Lexer lexer(program);
-  Parser parser(lexer);
-  Declaration* decl = parser.ParseDeclaration();
+  parse::Parser parser(lexer);
+  ast::Declaration* decl = parser.ParseDeclaration();
 
-  SerializeVisitor serializer;
+  ast::SerializeVisitor serializer;
   decl->Accept(&serializer);
 
   CHECK(serializer.GetSerializedString() == expected_output);
@@ -113,14 +113,14 @@ TEST_CASE("Parser: basic errors", "[parse]") {
   expr << "{ (1 + 2) * 3 / 7 if kek then true; };";
 
   lex::Lexer lexer(expr);
-  Parser parser(lexer);
+  parse::Parser parser(lexer);
   CHECK_THROWS_AS(parser.ParseStatement(), parse::errors::ParseCompoundError);
 
   std::stringstream expr2;
   expr2 << "if (1 + 2) * 3 / 7";
 
   lex::Lexer lexer2(expr);
-  Parser parser2(lexer2);
+  parse::Parser parser2(lexer2);
   CHECK_THROWS_AS(parser.ParseExpression(), parse::errors::ParseError);
 }
 
@@ -238,10 +238,10 @@ TEST_CASE("Parser: whole program", "[parse]") {
       "\t\t\t\t\t\t\tLiteral expression: 14\n";
 
   lex::Lexer lexer(prg);
-  Parser parser(lexer);
-  Program* stmt = parser.ParseProgram();
+  parse::Parser parser(lexer);
+  ast::Program* stmt = parser.ParseProgram();
 
-  SerializeVisitor serializer;
+  ast::SerializeVisitor serializer;
   stmt->Accept(&serializer);
   CHECK(serializer.GetSerializedString() == expected_output);
 }
@@ -279,10 +279,10 @@ TEST_CASE("Parser: complex function call", "[parse]") {
       "\t\tLiteral expression: hh\n";
 
   lex::Lexer lexer(prg);
-  Parser parser(lexer);
-  Expression* expr = parser.ParseExpression();
+  parse::Parser parser(lexer);
+  ast::Expression* expr = parser.ParseExpression();
 
-  SerializeVisitor serializer;
+  ast::SerializeVisitor serializer;
   expr->Accept(&serializer);
   CHECK(serializer.GetSerializedString() == expected_output);
 }

@@ -3,12 +3,12 @@
 
 ///////////////////////////////////////////////////////////////////
 
-Program* Parser::ParseProgram() {
+ast::Program* parse::Parser::ParseProgram() {
   bool errors_occured = false;
-  std::vector<Declaration*> decls;
+  std::vector<ast::Declaration*> decls;
   while (!lexer_.Matches(lex::TokenType::TOKEN_EOF)) {
     try {
-      Declaration* decl = ParseDeclaration();
+      ast::Declaration* decl = ParseDeclaration();
       if (decl == nullptr) {
         throw parse::errors::ParseDeclarationError((lexer_.Peek().location.Format()));
       }
@@ -25,12 +25,12 @@ Program* Parser::ParseProgram() {
     throw parse::errors::ParseProgramError();
   }
 
-  return new Program(std::move(decls));
+  return new ast::Program(std::move(decls));
 }
 
 ///////////////////////////////////////////////////////////////////
 
-Declaration* Parser::ParseDeclaration() {
+ast::Declaration* parse::Parser::ParseDeclaration() {
   if (auto var_declaration = ParseVarDeclStatement()) {
     return var_declaration;
   }
@@ -44,7 +44,7 @@ Declaration* Parser::ParseDeclaration() {
 
 ///////////////////////////////////////////////////////////////////
 
-FunDeclStatement* Parser::ParseFunDeclStatement() {
+ast::FunDeclStatement* parse::Parser::ParseFunDeclStatement() {
   if (!Matches(lex::TokenType::FUN)) {
     return nullptr;
   }
@@ -55,14 +55,14 @@ FunDeclStatement* Parser::ParseFunDeclStatement() {
   auto args = ParseFunctionArgs();
   Consume(lex::TokenType::RIGHT_BRACE);
   Consume(lex::TokenType::ASSIGN);
-  Expression* body = ParseExpression();
+  ast::Expression* body = ParseExpression();
   Consume(lex::TokenType::SEMICOLON);
-  return new FunDeclStatement(fun_name, std::move(args), body);
+  return new ast::FunDeclStatement(fun_name, std::move(args), body);
 }
 
 ///////////////////////////////////////////////////////////////////
 
-std::vector<lex::Token> Parser::ParseFunctionArgs() {
+std::vector<lex::Token> parse::Parser::ParseFunctionArgs() {
   std::vector<lex::Token> args;
 
   while (Matches(lex::TokenType::IDENTIFIER)) {
@@ -77,7 +77,7 @@ std::vector<lex::Token> Parser::ParseFunctionArgs() {
 
 ///////////////////////////////////////////////////////////////////
 
-VarDeclStatement* Parser::ParseVarDeclStatement() {
+ast::VarDeclStatement* parse::Parser::ParseVarDeclStatement() {
   if (!Matches(lex::TokenType::VAR)) {
     return nullptr;
   }
@@ -85,9 +85,9 @@ VarDeclStatement* Parser::ParseVarDeclStatement() {
   lex::Token var_name = lexer_.Peek();
   Consume(lex::TokenType::IDENTIFIER);
   Consume(lex::TokenType::ASSIGN);
-  Expression* value = ParseExpression();
+  ast::Expression* value = ParseExpression();
   Consume(lex::TokenType::SEMICOLON);
-  return new VarDeclStatement(var_name, value);
+  return new ast::VarDeclStatement(var_name, value);
 }
 
 ///////////////////////////////////////////////////////////////////

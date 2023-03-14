@@ -5,19 +5,21 @@
 #include <lex/token.hpp>
 
 #include <vector>
+#include "syntax_tree.hpp"
+#include "statements.hpp"
+#include "expressions.hpp"
 
 //////////////////////////////////////////////////////////////////////
 
-class Declaration : public Statement {
+namespace ast {
+class Declaration : public ast::Statement {
  public:
   void Accept(Visitor*) override {};
 
   virtual std::string_view GetName() = 0;
 };
 
-//////////////////////////////////////////////////////////////////////
-
-class Program : public TreeNode {
+class Program : public ast::TreeNode {
  public:
   void Accept(Visitor* visitor) override {
     visitor->VisitProgram(this);
@@ -33,8 +35,6 @@ class Program : public TreeNode {
 
   std::vector<Declaration*> decls_;
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class VarDeclStatement : public Declaration {
  public:
@@ -58,11 +58,9 @@ class VarDeclStatement : public Declaration {
   Expression* expr_;
 };
 
-//////////////////////////////////////////////////////////////////////
-
 class FunDeclStatement : public Declaration {
  public:
-  FunDeclStatement(lex::Token name, std::vector<lex::Token> params, Expression* body)
+  FunDeclStatement(lex::Token name, std::__1::vector<lex::Token> params, Expression* body)
       : name_{name}, params_{std::move(params)}, body_{body} {
   }
 
@@ -79,8 +77,7 @@ class FunDeclStatement : public Declaration {
   }
 
   lex::Token name_;
-  std::vector<lex::Token> params_;
+  std::__1::vector<lex::Token> params_;
   Expression* body_;
 };
-
-//////////////////////////////////////////////////////////////////////
+}  // namespace ast
