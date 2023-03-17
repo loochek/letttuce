@@ -1,18 +1,11 @@
 #pragma once
 
 #include <fmt/core.h>
+#include <error/compile_error.hpp>
 
-#include <string>
+namespace parse::error {
 
-namespace parse::errors {
-
-struct ParseError : std::exception {
-  std::string message;
-
-  const char* what() const noexcept override {
-    return message.c_str();
-  }
-};
+struct ParseError : ::error::CompileError {};
 
 struct ParsePrimaryError : ParseError {
   explicit ParsePrimaryError(const std::string& location) {
@@ -49,13 +42,13 @@ struct ParseTokenError : ParseError {
 struct ParseCompoundError : ParseError {
   explicit ParseCompoundError(const std::string& location) {
     message = fmt::format(
-        "Some errors in compound block at location {} have occured", location);
+        "Some error in compound block at location {} have occured", location);
   }
 };
 
 struct ParseProgramError : ParseError {
   ParseProgramError() {
-    message = "Program has some errors\n";
+    message = "Program has some error\n";
   }
 };
 
@@ -65,4 +58,4 @@ struct ParseDeclarationError : ParseError {
   }
 };
 
-}  // namespace parse::errors
+}  // namespace parse::error

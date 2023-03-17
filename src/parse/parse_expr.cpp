@@ -65,7 +65,7 @@ ast::Expression* parse::Parser::ParseCompoundExpression() {
       } else {
         statements.push_back(ParseStatement());
       }
-    } catch (parse::errors::ParseError& error) {
+    } catch (parse::error::ParseError& error) {
       ReportError(error);
       Synchronize();
       errors_occured = true;
@@ -73,7 +73,7 @@ ast::Expression* parse::Parser::ParseCompoundExpression() {
   }
 
   if (errors_occured) {
-    throw parse::errors::ParseCompoundError(compound_start_token.location.Format());
+    throw parse::error::ParseCompoundError(compound_start_token.location.Format());
   }
 
   return new ast::BlockExpression(std::move(statements));
@@ -173,7 +173,7 @@ ast::Expression* parse::Parser::ParsePrimaryExpression() {
       return new ast::LiteralExpression(curr_token);
 
     default:
-      throw parse::errors::ParsePrimaryError(curr_token.location.Format());
+      throw parse::error::ParsePrimaryError(curr_token.location.Format());
   }
 
   FMT_ASSERT(false, "Unreachable!");

@@ -10,11 +10,11 @@ ast::Program* parse::Parser::ParseProgram() {
     try {
       ast::Declaration* decl = ParseDeclaration();
       if (decl == nullptr) {
-        throw parse::errors::ParseDeclarationError((lexer_.Peek().location.Format()));
+        throw parse::error::ParseDeclarationError((lexer_.Peek().location.Format()));
       }
 
       decls.push_back(decl);
-    } catch (parse::errors::ParseError& error) {
+    } catch (parse::error::ParseError& error) {
       ReportError(error);
       Synchronize();
       errors_occured = true;
@@ -22,7 +22,7 @@ ast::Program* parse::Parser::ParseProgram() {
   }
 
   if (errors_occured) {
-    throw parse::errors::ParseProgramError();
+    throw parse::error::ParseProgramError();
   }
 
   return new ast::Program(std::move(decls));

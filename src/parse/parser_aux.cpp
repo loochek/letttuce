@@ -1,23 +1,24 @@
 #include <parse/parse_error.hpp>
 #include <parse/parser.hpp>
+#include <error/error_handler.hpp>
 
 parse::Parser::Parser(lex::Lexer& l) : lexer_{l} {
 }
 
 void parse::Parser::Consume(lex::TokenType type) {
   if (!Matches(type)) {
-    throw parse::errors::ParseTokenError(lex::FormatTokenType(type), FormatLocation());
+    throw parse::error::ParseTokenError(lex::FormatTokenType(type), FormatLocation());
   }
 }
 
-void parse::Parser::ReportError(const parse::errors::ParseError& error) {
+void parse::Parser::ReportError(const parse::error::ParseError& error) {
   // TODO: normal error printing
-  if (dynamic_cast<const parse::errors::ParseCompoundError*>(&error) != nullptr) {
+  if (dynamic_cast<const parse::error::ParseCompoundError*>(&error) != nullptr) {
     // ew
     return;
   }
 
-  fmt::print("Error: {}\n", error.what());
+  ::error::ErrorHandler::GetInstance().ReportCompileError(error);
 }
 
 void parse::Parser::Synchronize() {

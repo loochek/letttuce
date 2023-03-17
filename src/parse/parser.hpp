@@ -65,14 +65,14 @@ class Parser {
     return lexer_.Peek().location.Format();
   }
 
-  std::__1::vector<lex::Token> ParseFunctionArgs();
+  std::vector<lex::Token> ParseFunctionArgs();
 
   bool Matches(lex::TokenType type) {
     return lexer_.Matches(type);
   }
 
   void Consume(lex::TokenType type);
-  void ReportError(const errors::ParseError& error);
+  static void ReportError(const error::ParseError& error);
 
   /// Skips tokens until semicolon or EOF is encountered
   void Synchronize();

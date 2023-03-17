@@ -19,5 +19,9 @@ struct Location {
   std::string Format() const {
     return fmt::format("line {}, column {}",  lineno + 1, columnno + 1);
   }
+
+  bool operator<(const Location &other) const {
+    return abs_pos < other.abs_pos;
+  }
 };
 }  // namespace lex
