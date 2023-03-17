@@ -24,6 +24,8 @@ class ScopeGenerator : public BaseVisitor {
 
   void VisitVarDeclaration(VarDeclStatement* decl) override {
     decl->scope = current_scope;
+    BaseVisitor::VisitVarDeclaration(decl);
+
     bool success =
         current_scope->AddSymbol(Symbol{.type = SymbolType::VarDecl,
                                         .name = decl->GetName(),
@@ -34,7 +36,6 @@ class ScopeGenerator : public BaseVisitor {
                                      decl->GetLocation().Format());
     }
 
-    BaseVisitor::VisitVarDeclaration(decl);
   }
 
   void VisitFunDeclaration(FunDeclStatement* decl) override {
