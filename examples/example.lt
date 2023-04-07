@@ -6,6 +6,7 @@ of [Int, Int] -> Int fun main(argc, argv) = {
 
 of [Int,Int,Int] -> Int fun magic_calc(a, b, c) = {
     of Int var b = b + 5;
+    b = b + 6;
     if (global_var == 14) then return a * b + c;
 };
 

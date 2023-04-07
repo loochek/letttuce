@@ -11,7 +11,7 @@ ast::Statement* parse::Parser::ParseStatement() {
     lex::Token assn_token = lexer_.GetPreviousToken();
     ast::Expression* value = ParseExpression();
     Consume(lex::TokenType::SEMICOLON);
-    return new ast::AssignmentStatement(assn_token, expr->as<ast::LvalueExpression>(), value);
+    return new ast::AssignmentStatement(assn_token, expr, value);
   }
 
   // Expression statement

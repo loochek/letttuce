@@ -34,7 +34,7 @@ class ExprStatement : public Statement {
 
 class AssignmentStatement : public Statement {
  public:
-  explicit AssignmentStatement(lex::Token assn_token, LvalueExpression* lhs,
+  explicit AssignmentStatement(lex::Token assn_token, Expression* lhs,
                                Expression* rhs)
       : assn_token_{assn_token}, lhs_{lhs}, rhs_{rhs} {
   }
@@ -48,7 +48,7 @@ class AssignmentStatement : public Statement {
   }
 
   lex::Token assn_token_;
-  LvalueExpression* lhs_;
+  Expression* lhs_;
   Expression* rhs_;
 };
 }  // namespace ast
