@@ -27,13 +27,9 @@ class Scope {
     return true;
   }
 
-  Symbol* LookupLocal(const std::string_view& name) {
-    return LookupLocal(name, lex::Location{}, false);
-  }
-
-  Symbol* LookupLocal(const std::string_view& name, const lex::Location& location, bool prev_check = true) {
+  Symbol* LookupLocal(const std::string_view& name, const lex::Location& location) {
     for (auto& [symbol_name, symbol] : symbols_) {
-      if (symbol_name == name && (!prev_check || (symbol.location < location))) {
+      if (symbol_name == name && (symbol.global_scope || (symbol.location < location))) {
         return &symbol;
       }
     }
@@ -41,18 +37,14 @@ class Scope {
     return nullptr;
   }
 
-  Symbol* Lookup(const std::string_view& name) {
-    return Lookup(name, lex::Location{}, false);
-  }
-
-  Symbol* Lookup(const std::string_view& name, const lex::Location& location, bool prev_check = true) {
-    Symbol* local = LookupLocal(name, location, prev_check);
+  Symbol* Lookup(const std::string_view& name, const lex::Location& location) {
+    Symbol* local = LookupLocal(name, location);
     if (local != nullptr) {
       return local;
     }
 
     // If symbol is not present locally, search it in parent scopes
-    return parent_ != nullptr ? GetParent()->Lookup(name) : nullptr;
+    return parent_ != nullptr ? GetParent()->Lookup(name, location) : nullptr;
   }
 
  private:

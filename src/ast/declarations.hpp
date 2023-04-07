@@ -1,13 +1,10 @@
 #pragma once
 
 #include <ast/statements.hpp>
-
 #include <lex/token.hpp>
+#include <types/type.hpp>
 
 #include <vector>
-#include "syntax_tree.hpp"
-#include "statements.hpp"
-#include "expressions.hpp"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -38,8 +35,8 @@ class Program : public ast::TreeNode {
 
 class VarDeclStatement : public Declaration {
  public:
-  VarDeclStatement(lex::Token name, Expression* expr)
-      : name_{name}, expr_{expr} {
+  VarDeclStatement(lex::Token name, types::Type* type, Expression* init_expr)
+      : name_{name}, type_{type}, init_expr_{init_expr} {
   }
 
   void Accept(Visitor* visitor) override {
@@ -55,13 +52,14 @@ class VarDeclStatement : public Declaration {
   }
 
   lex::Token name_;
-  Expression* expr_;
+  types::Type* type_;
+  Expression* init_expr_;
 };
 
 class FunDeclStatement : public Declaration {
  public:
-  FunDeclStatement(lex::Token name, std::__1::vector<lex::Token> params, Expression* body)
-      : name_{name}, params_{std::move(params)}, body_{body} {
+  FunDeclStatement(lex::Token name, std::vector<lex::Token> params, types::FunctionType* type, Expression* body)
+      : name_{name}, params_{std::move(params)}, type_{type}, body_{body} {
   }
 
   void Accept(Visitor* visitor) override {
@@ -77,7 +75,8 @@ class FunDeclStatement : public Declaration {
   }
 
   lex::Token name_;
-  std::__1::vector<lex::Token> params_;
+  std::vector<lex::Token> params_;
+  types::FunctionType* type_;
   Expression* body_;
 };
 }  // namespace ast

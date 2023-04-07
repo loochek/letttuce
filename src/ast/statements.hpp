@@ -6,8 +6,6 @@
 #include <lex/token.hpp>
 
 #include <vector>
-#include "syntax_tree.hpp"
-#include "expressions.hpp"
 
 //////////////////////////////////////////////////////////////////////
 

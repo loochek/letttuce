@@ -1,14 +1,18 @@
 #pragma once
 
 #include <ast/declarations.hpp>
+#include <types/type.hpp>
 #include <parse/parse_error.hpp>
 #include <lex/lexer.hpp>
+#include <utils/storage.hpp>
 #include <utility>
+
+// TODO: handle lifetime of scopes and AST nodes
 
 namespace parse {
 class Parser {
  public:
-  explicit Parser(lex::Lexer& l);
+  explicit Parser(lex::Lexer& lexer, utils::Storage<types::Type>& type_keeper);
 
   ast::Program* ParseProgram();
 
@@ -20,8 +24,8 @@ class Parser {
 
   ast::Declaration* ParseDeclaration();
 
-  ast::FunDeclStatement* ParseFunDeclStatement();
-  ast::VarDeclStatement* ParseVarDeclStatement();
+  ast::FunDeclStatement* ParseFunDeclStatement(types::Type* type);
+  ast::VarDeclStatement* ParseVarDeclStatement(types::Type* type);
 
   ////////////////////////////////////////////////////////////////////
 
@@ -46,19 +50,29 @@ class Parser {
 
   ////////////////////////////////////////////////////////////////////
 
-  template<ast::Expression* (Parser::*InnerParser)(), lex::TokenType... Tokens>
+  template<
+      ast::Expression* (Parser::*InnerParser)(),
+      typename ResultNode,
+      lex::TokenType... Tokens
+      >
   ast::Expression* ParseBinaryExpression() {
     ast::Expression *lhs = (this->*InnerParser)();
 
     while ((Matches(Tokens) || ...)) {
       lex::Token operation = lexer_.GetPreviousToken();
-      lhs = new ast::BinaryExpression(operation, lhs, (this->*InnerParser)());
+      lhs = new ResultNode(operation, lhs, (this->*InnerParser)());
     }
 
     return lhs;
   }
 
   ////////////////////////////////////////////////////////////////////
+
+  types::Type* ParsePrimitiveType();
+  types::Type* ParseSimpleType();
+  types::Type* ParseType();
+  types::Type* ParseSignature();
+
 
  private:
   std::string FormatLocation() {
@@ -79,5 +93,6 @@ class Parser {
 
  private:
   lex::Lexer& lexer_;
+  utils::Storage<types::Type>& type_keeper_;
 };
 }  // namespace parse

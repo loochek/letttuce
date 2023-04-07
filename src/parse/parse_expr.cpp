@@ -82,25 +82,41 @@ ast::Expression* parse::Parser::ParseCompoundExpression() {
 ////////////////////////////////////////////////////////////////////
 
 ast::Expression* parse::Parser::ParseEqualityExpression() {
-  return ParseBinaryExpression<&Parser::ParseRelationalExpression, lex::TokenType::EQUALS, lex::TokenType::NOT_EQ>();
+  return ParseBinaryExpression<
+      &Parser::ParseRelationalExpression,
+      ast::ComparisonExpression,
+      lex::TokenType::EQUALS, lex::TokenType::NOT_EQ
+      >();
 }
 
 ////////////////////////////////////////////////////////////////////
 
 ast::Expression* parse::Parser::ParseRelationalExpression() {
-  return ParseBinaryExpression<&Parser::ParseAdditiveExpression, lex::TokenType::LT, lex::TokenType::GT>();
+  return ParseBinaryExpression<
+      &Parser::ParseAdditiveExpression,
+      ast::ComparisonExpression,
+      lex::TokenType::LT, lex::TokenType::GT
+      >();
 }
 
 ////////////////////////////////////////////////////////////////////
 
 ast::Expression* parse::Parser::ParseAdditiveExpression() {
-  return ParseBinaryExpression<&Parser::ParseMultiplicativeExpression, lex::TokenType::PLUS, lex::TokenType::MINUS>();
+  return ParseBinaryExpression<
+      &Parser::ParseMultiplicativeExpression,
+      ast::BinaryExpression,
+      lex::TokenType::PLUS, lex::TokenType::MINUS
+      >();
 }
 
 ////////////////////////////////////////////////////////////////////
 
 ast::Expression* parse::Parser::ParseMultiplicativeExpression() {
-  return ParseBinaryExpression<&parse::Parser::ParseUnaryExpression, lex::TokenType::STAR, lex::TokenType::DIV>();
+  return ParseBinaryExpression<
+      &parse::Parser::ParseUnaryExpression,
+      ast::BinaryExpression,
+      lex::TokenType::STAR, lex::TokenType::DIV
+      >();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -167,6 +183,7 @@ ast::Expression* parse::Parser::ParsePrimaryExpression() {
   switch (curr_token.type) {
     case lex::TokenType::IDENTIFIER:
     case lex::TokenType::NUMBER:
+    case lex::TokenType::STRING:
     case lex::TokenType::TRUE:
     case lex::TokenType::FALSE:
       lexer_.Advance();

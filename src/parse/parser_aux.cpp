@@ -2,7 +2,8 @@
 #include <parse/parser.hpp>
 #include <error/error_handler.hpp>
 
-parse::Parser::Parser(lex::Lexer& l) : lexer_{l} {
+parse::Parser::Parser(lex::Lexer& lexer, utils::Storage<types::Type>& type_keeper) :
+      lexer_{lexer}, type_keeper_{type_keeper} {
 }
 
 void parse::Parser::Consume(lex::TokenType type) {

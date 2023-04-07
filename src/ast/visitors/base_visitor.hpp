@@ -75,7 +75,7 @@ class BaseVisitor : public Visitor {
   }
 
   void VisitVarDeclaration(VarDeclStatement* decl) override {
-    decl->expr_->Accept(this);
+    decl->init_expr_->Accept(this);
   }
 
   void VisitFunDeclaration(FunDeclStatement* decl) override {

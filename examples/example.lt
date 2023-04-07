@@ -1,0 +1,12 @@
+# Complete Lettuce program
+
+of [Int, Int] -> Int fun main(argc, argv) = {
+    return magic_calc(global_var, 12 + 8 / 6, if 1 + 1 == 2 then 13 else 14);
+};
+
+of [Int,Int,Int] -> Int fun magic_calc(a, b, c) = {
+    of Int var b = b + 5;
+    if (global_var == 14) then return a * b + c;
+};
+
+of Int var global_var = if 12 == 11 + 1 then 14 else 15 + 81;

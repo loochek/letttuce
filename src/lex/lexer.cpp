@@ -89,6 +89,7 @@ std::optional<Token> Lexer::MatchOperators() {
     switch (*op_type) {
       case TokenType::NOT_EQ:
       case TokenType::EQUALS:
+      case TokenType::ARROW:
         scanner_.MoveNext();
         [[fallthrough]];
       default:
@@ -109,7 +110,11 @@ std::optional<TokenType> Lexer::PeekOperator() {
       return TokenType::PLUS;
 
     case '-':
-      return TokenType::MINUS;
+      if (scanner_.NextSymbol() == '>') {
+        return TokenType::ARROW;
+      } else {
+        return TokenType::MINUS;
+      }
 
     case '*':
       return TokenType::STAR;
@@ -134,6 +139,12 @@ std::optional<TokenType> Lexer::PeekOperator() {
 
     case '}':
       return TokenType::RIGHT_CBRACE;
+
+    case '[':
+      return TokenType::LEFT_SBRACE;
+
+    case ']':
+      return TokenType::RIGHT_SBRACE;
 
     case ',':
       return TokenType::COMMA;

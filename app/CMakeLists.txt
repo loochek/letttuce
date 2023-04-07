@@ -1,2 +1,2 @@
-add_executable(repl repl.cpp)
-target_link_libraries(repl PUBLIC compiler)
+add_executable(ltc ltc.cpp)
+target_link_libraries(ltc PUBLIC compiler)

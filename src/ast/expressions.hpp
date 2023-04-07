@@ -3,6 +3,7 @@
 #include <ast/visitors/visitor.hpp>
 #include <ast/syntax_tree.hpp>
 #include <lex/token.hpp>
+#include <types/type.hpp>
 #include <utility>
 #include <vector>
 
@@ -12,8 +13,7 @@ namespace ast {
 
 class Expression : public TreeNode {
  public:
-  // Later
-  // virtual types::Type* GetType() = 0;
+  types::Type* type = nullptr;
 };
 
 // Assignable entity

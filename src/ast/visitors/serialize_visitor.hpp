@@ -159,7 +159,7 @@ class SerializeVisitor : public Visitor {
         out_ << fmt::format("Variable declaration: {}\n", decl->GetName()));
     INDENTED(out_ << fmt::format("Initializer:\n"));
     IdentBlock([&]() {
-      decl->expr_->Accept(this);
+      decl->init_expr_->Accept(this);
     });
   }
 

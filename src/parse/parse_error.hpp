@@ -58,4 +58,10 @@ struct ParseDeclarationError : ParseError {
   }
 };
 
+struct FnDeclArgsCountMismatchError : ParseError {
+  explicit FnDeclArgsCountMismatchError(const std::string& location) {
+    message = fmt::format("Count of given arguments doesn't match to the function type at location {}", location);
+  }
+};
+
 }  // namespace parse::error

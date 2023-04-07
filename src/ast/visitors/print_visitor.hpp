@@ -112,13 +112,13 @@ class PrintVisitor : public Visitor {
   }
 
   void VisitVarDeclaration(ast::VarDeclStatement* decl) override {
-    INDENTED(fmt::print("Variable declaration: {}\n", decl->GetName()));
+    INDENTED(fmt::print("Variable declaration: {} of type {}\n", decl->GetName(), decl->type_->Format()));
     INDENTED(fmt::print("Initializer:\n"));
-    IdentBlock([&]() { decl->expr_->Accept(this); });
+    IdentBlock([&]() { decl->init_expr_->Accept(this); });
   }
 
   void VisitFunDeclaration(ast::FunDeclStatement* decl) override {
-    INDENTED(fmt::print("Function declaration: {}\n", decl->GetName()));
+    INDENTED(fmt::print("Function declaration: {} of type {}\n", decl->GetName(), decl->type_->Format()));
 
     INDENTED(fmt::print("Params: "));
     for (auto& param : decl->params_) {

@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <ast/declarations.hpp>
+#include <types/type.hpp>
 
 namespace ast {
 
@@ -13,11 +14,11 @@ enum class SymbolType {
 };
 
 struct VarSymbol {
-  // Type? (in the future)
+  types::Type* type;
 };
 
 struct FnSymbol {
-  // Types of arguments and return value ???
+  types::FunctionType* type;
 };
 
 struct TypeSymbol {
@@ -28,6 +29,7 @@ struct Symbol {
   SymbolType type = SymbolType::Dummy;
   std::string_view name;
   lex::Location location;
+  bool global_scope = false;
 
   std::variant<FnSymbol, VarSymbol, TypeSymbol> symbol;
 };

@@ -1,7 +1,7 @@
 #include <lex/lexer.hpp>
 #include <parse/parser.hpp>
 #include <parse/parse_error.hpp>
-#include <ast/visitors/scope_generator.hpp>
+#include <ast/visitors/symbol_table_builder.hpp>
 #include <ast/visitors/definition_checker.hpp>
 
 // Finally,
@@ -27,7 +27,7 @@ TEST_CASE("Symbol table: just works", "[symbol]") {
   parse::Parser parser(lexer);
   ast::Program* prg = parser.ParseProgram();
 
-  ast::ScopeGenerator gen;
+  ast::SymbolTableBuilder gen;
   prg->Accept(&gen);
 
   ast::DefinitionChecker checker;
@@ -48,7 +48,7 @@ TEST_CASE("Symbol table: undefined symbol", "[symbol]") {
   parse::Parser parser(lexer);
   ast::Program* prg = parser.ParseProgram();
 
-  ast::ScopeGenerator gen;
+  ast::SymbolTableBuilder gen;
   prg->Accept(&gen);
 
   ast::DefinitionChecker checker;
@@ -70,7 +70,7 @@ TEST_CASE("Symbol table: order-sensitive", "[symbol]") {
   parse::Parser parser(lexer);
   ast::Program* prg = parser.ParseProgram();
 
-  ast::ScopeGenerator gen;
+  ast::SymbolTableBuilder gen;
   prg->Accept(&gen);
 
   ast::DefinitionChecker checker;
@@ -93,7 +93,7 @@ TEST_CASE("Symbol table: redefinition", "[symbol]") {
   parse::Parser parser(lexer);
   ast::Program* prg = parser.ParseProgram();
 
-  ast::ScopeGenerator gen;
+  ast::SymbolTableBuilder gen;
   CHECK_THROWS_AS(prg->Accept(&gen), ast::error::RedefinitionError);
 }
 

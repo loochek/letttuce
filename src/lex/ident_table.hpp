@@ -39,6 +39,7 @@ class IdentTable {
     map_["for"] = TokenType::FOR;
     map_["return"] = TokenType::RETURN;
     map_["yield"] = TokenType::YIELD;
+    map_["of"] = TokenType::OF;
 
     map_["Int"] = TokenType::TY_INT;
     map_["Bool"] = TokenType::TY_BOOL;

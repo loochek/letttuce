@@ -4,14 +4,14 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 
-<file> ::= <declaration>*    // <------- TODO: implement
+<file> ::= <declaration>*
 
 <declaration> ::= <function-definition>
                 | <variable-declaration>
 
-<function-declaration> ::= fun <identifier> <parameter-list> = <expression> ;
+<function-declaration> ::= <signature> fun <identifier> <parameter-list> = <expression> ;
 
-<variable-declaration> ::= var <identifier> = <expression> ;
+<variable-declaration> ::= <signature> var <identifier> = <expression> ;
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,20 @@
 
 <constant> ::= <integer-constant>
              | <string>
+             
+             
+// Typing 
 
+<signature> ::= of <type>
+
+<type> ::= <simple-type> # Simple type
+         | [<type>, ...] -> <type> # Function type
+
+<simple-type> ::=
+                     | * <simple-type>
+                     | <primitive-type>
+                     
+<primitive-type> ::= Int | Bool | String | Char | Unit | () | !
 
 ////////////////////////////////////////////////////////////////////////////////////
 //!                             Statements

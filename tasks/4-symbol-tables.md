@@ -103,7 +103,7 @@ fun main argc argv = f(0);
 1. Прочитайте часть главы про *scope* [Crafting Interpreters: Scope](https://craftinginterpreters.com/statements-and-state.html#scope)
 2. Придумайте как и что хранить в структуре `Symbol`.
 3. Реализуйте древесную структуру *Scope*-ов c указателями на родителей.
-4. Создайте `ScopeGenerator`*—visitor*
+4. Создайте `SymbolTableBuilder`*—visitor*
 
 ## Playground
 
