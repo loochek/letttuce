@@ -1,8 +1,8 @@
 #include <lex/lexer.hpp>
 #include <parse/parser.hpp>
 #include <parse/parse_error.hpp>
-#include <ast/visitors/symbol_table_builder.hpp>
-#include <ast/visitors/definition_checker.hpp>
+#include <passes/symbol_table_builder.hpp>
+#include <passes/definition_checker.hpp>
 
 // Finally,
 #include <catch2/catch.hpp>
@@ -52,7 +52,7 @@ TEST_CASE("Symbol table: undefined symbol", "[symbol]") {
   prg->Accept(&gen);
 
   ast::DefinitionChecker checker;
-  CHECK_THROWS_AS(prg->Accept(&checker), ast::error::UndefinedSymbolError);
+  CHECK_THROWS_AS(prg->Accept(&checker), ast::errors::UndefinedSymbolError);
 }
 
 TEST_CASE("Symbol table: order-sensitive", "[symbol]") {
@@ -74,7 +74,7 @@ TEST_CASE("Symbol table: order-sensitive", "[symbol]") {
   prg->Accept(&gen);
 
   ast::DefinitionChecker checker;
-  CHECK_THROWS_AS(prg->Accept(&checker), ast::error::UndefinedSymbolError);
+  CHECK_THROWS_AS(prg->Accept(&checker), ast::errors::UndefinedSymbolError);
 }
 
 TEST_CASE("Symbol table: redefinition", "[symbol]") {
@@ -94,6 +94,6 @@ TEST_CASE("Symbol table: redefinition", "[symbol]") {
   ast::Program* prg = parser.ParseProgram();
 
   ast::SymbolTableBuilder gen;
-  CHECK_THROWS_AS(prg->Accept(&gen), ast::error::RedefinitionError);
+  CHECK_THROWS_AS(prg->Accept(&gen), ast::errors::RedefinitionError);
 }
 

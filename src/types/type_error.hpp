@@ -1,11 +1,11 @@
 #pragma once
 
 #include <fmt/core.h>
-#include <error/compile_error.hpp>
+#include <errors/compile_error.hpp>
 
-namespace types::error {
+namespace types::errors {
 
-struct TypeError : ::error::CompileError {};
+struct TypeError : ::errors::CompileError {};
 
 struct ArithmTypeError : TypeError {
   explicit ArithmTypeError(const std::string& location) {
@@ -92,4 +92,4 @@ struct WrongReturnTypeError : TypeError {
   }
 };
 
-}  // namespace types::error
+}  // namespace types::errors

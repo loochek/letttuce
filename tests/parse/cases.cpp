@@ -114,14 +114,14 @@ TEST_CASE("Parser: basic errors", "[parse]") {
 
   lex::Lexer lexer(expr);
   parse::Parser parser(lexer);
-  CHECK_THROWS_AS(parser.ParseStatement(), parse::error::ParseCompoundError);
+  CHECK_THROWS_AS(parser.ParseStatement(), parse::errors::ParseCompoundError);
 
   std::stringstream expr2;
   expr2 << "if (1 + 2) * 3 / 7";
 
   lex::Lexer lexer2(expr);
   parse::Parser parser2(lexer2);
-  CHECK_THROWS_AS(parser.ParseExpression(), parse::error::ParseError);
+  CHECK_THROWS_AS(parser.ParseExpression(), parse::errors::ParseError);
 }
 
 TEST_CASE("Parser: whole program", "[parse]") {

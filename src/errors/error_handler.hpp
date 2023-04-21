@@ -1,9 +1,9 @@
 #pragma once
 
 #include <fmt/core.h>
-#include <error/compile_error.hpp>
+#include <errors/compile_error.hpp>
 
-namespace error {
+namespace errors {
 class ErrorHandler {
  public:
   static ErrorHandler& GetInstance() {
@@ -11,11 +11,11 @@ class ErrorHandler {
     return handler;
   }
 
-  void ReportCompileError(const error::CompileError& error) {
+  void ReportCompileError(const errors::CompileError& error) {
     fmt::print("Error: {}\n", error.what());
   }
 
  private:
   ErrorHandler() = default;
 };
-} // namespace error
+} // namespace errors

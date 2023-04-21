@@ -86,7 +86,7 @@ class Parser {
   }
 
   void Consume(lex::TokenType type);
-  static void ReportError(const error::ParseError& error);
+  static void ReportError(const errors::ParseError& error);
 
   /// Skips tokens until semicolon or EOF is encountered
   void Synchronize();

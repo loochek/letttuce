@@ -6,90 +6,90 @@
 #include <types/type.hpp>
 #include <types/primitive_types.hpp>
 
-namespace ast {
+namespace passes {
 // Evaluates types of expressions and perform type checking
-class TypeEvaluator : public BaseVisitor {
+class TypeEvaluator : public ast::BaseVisitor {
  public:
-  void VisitComparisonExpression(ComparisonExpression* expr) override {
+  void VisitComparisonExpression(ast::ComparisonExpression* expr) override {
     BaseVisitor::VisitComparisonExpression(expr);
 
     if (!(expr->lhs_->type->Equals(&types::PrimitiveType::int_type) &&
           expr->rhs_->type->Equals(&types::PrimitiveType::int_type))) {
-      throw types::error::ArithmTypeError(expr->GetLocation().Format());
+      throw types::errors::ArithmTypeError(expr->GetLocation().Format());
     }
 
     expr->type = &types::PrimitiveType::bool_type;
   }
 
-  void VisitBinaryExpression(BinaryExpression* expr) override {
+  void VisitBinaryExpression(ast::BinaryExpression* expr) override {
     BaseVisitor::VisitBinaryExpression(expr);
 
     if (!(expr->lhs_->type->Equals(&types::PrimitiveType::int_type) &&
           expr->rhs_->type->Equals(&types::PrimitiveType::int_type))) {
-      throw types::error::ArithmTypeError(expr->GetLocation().Format());
+      throw types::errors::ArithmTypeError(expr->GetLocation().Format());
     }
 
     expr->type = &types::PrimitiveType::int_type;
   }
 
-  void VisitUnaryExpression(UnaryExpression* expr) override {
+  void VisitUnaryExpression(ast::UnaryExpression* expr) override {
     BaseVisitor::VisitUnaryExpression(expr);
 
     if (!expr->expr_->type->Equals(&types::PrimitiveType::int_type)) {
-      throw types::error::ArithmTypeError(expr->GetLocation().Format());
+      throw types::errors::ArithmTypeError(expr->GetLocation().Format());
     }
 
     expr->type = &types::PrimitiveType::int_type;
   }
 
-  void VisitIfExpression(IfExpression* expr) override {
+  void VisitIfExpression(ast::IfExpression* expr) override {
     BaseVisitor::VisitIfExpression(expr);
 
     if (!expr->condition_->type->Equals(&types::PrimitiveType::bool_type)) {
-      throw types::error::IfConditionTypeError(expr->condition_->GetLocation().Format());
+      throw types::errors::IfConditionTypeError(expr->condition_->GetLocation().Format());
     }
 
     if (expr->else_branch_ != nullptr && !expr->then_branch_->type->Equals(expr->else_branch_->type)) {
-      throw types::error::IfBranchesTypeError(expr->GetLocation().Format());
+      throw types::errors::IfBranchesTypeError(expr->GetLocation().Format());
     }
 
     expr->type = expr->then_branch_->type;
   }
 
-  void VisitBlockExpression(BlockExpression* expr) override {
+  void VisitBlockExpression(ast::BlockExpression* expr) override {
     BaseVisitor::VisitBlockExpression(expr);
 
     if (expr->statements_.empty()) {
       expr->type = &types::PrimitiveType::unit_type;
-    } else if (auto expr_stmt = dynamic_cast<ExprStatement*>(expr->statements_.back())) {
+    } else if (auto expr_stmt = dynamic_cast<ast::ExprStatement*>(expr->statements_.back())) {
       expr->type = expr_stmt->expr_->type;
     } else {
       expr->type = &types::PrimitiveType::unit_type;
     }
   }
 
-  void VisitFnCallExpression(FnCallExpression* expr) override {
+  void VisitFnCallExpression(ast::FnCallExpression* expr) override {
     BaseVisitor::VisitFnCallExpression(expr);
 
     auto func_type = dynamic_cast<types::FunctionType*>(expr->callable_->type);
     if (func_type == nullptr) {
-      throw types::error::FnCallNonFuncTypeError(expr->GetLocation().Format());
+      throw types::errors::FnCallNonFuncTypeError(expr->GetLocation().Format());
     }
 
     if (func_type->GetArgTypes().size() != expr->args_.size()) {
-      throw types::error::FnCallArgCountMismatchError(expr->GetLocation().Format());
+      throw types::errors::FnCallArgCountMismatchError(expr->GetLocation().Format());
     }
 
     for (size_t i = 0; i < expr->args_.size(); i++) {
       if (!func_type->GetArgTypes()[i]->Equals(expr->args_[i]->type)) {
-        throw types::error::FnCallArgTypeMismatchError(expr->GetLocation().Format());
+        throw types::errors::FnCallArgTypeMismatchError(expr->GetLocation().Format());
       }
     }
 
     expr->type = func_type->GetReturnType();
   }
 
-  void VisitLiteralExpression(LiteralExpression* expr) override {
+  void VisitLiteralExpression(ast::LiteralExpression* expr) override {
     switch (expr->literal_.type) {
       case lex::TokenType::NUMBER:
         expr->type = &types::PrimitiveType::int_type;
@@ -105,16 +105,16 @@ class TypeEvaluator : public BaseVisitor {
         return;
 
       case lex::TokenType::IDENTIFIER: {
-        Symbol* symbol = expr->scope->Lookup(expr->literal_.GetIdentifier(), expr->GetLocation());
+        ast::Symbol* symbol = expr->scope->Lookup(expr->literal_.GetIdentifier(), expr->GetLocation());
         FMT_ASSERT(symbol != nullptr, "Unknown symbol at type evaluation stage");
 
         switch (symbol->type) {
-          case SymbolType::VarDecl:
-            expr->type = std::get<VarSymbol>(symbol->symbol).type;
+          case ast::SymbolType::VarDecl:
+            expr->type = std::get<ast::VarSymbol>(symbol->symbol).type;
             return;
 
-          case SymbolType::FnDecl:
-            expr->type = std::get<FnSymbol>(symbol->symbol).type;
+          case ast::SymbolType::FnDecl:
+            expr->type = std::get<ast::FnSymbol>(symbol->symbol).type;
             return;
 
           default:
@@ -127,61 +127,61 @@ class TypeEvaluator : public BaseVisitor {
     }
   }
 
-  void VisitVarAccessExpression(VarAccessExpression* expression) override {
+  void VisitVarAccessExpression(ast::VarAccessExpression* expression) override {
     BaseVisitor::VisitVarAccessExpression(expression);
     // ???
     // Seems to be unused by me :)
   }
 
-  void VisitYieldExpression(YieldExpression* expr) override {
+  void VisitYieldExpression(ast::YieldExpression* expr) override {
     BaseVisitor::VisitYieldExpression(expr);
     // ???
     // Seems to be unused by me :)
   }
 
-  void VisitReturnExpression(ReturnExpression* expr) override {
+  void VisitReturnExpression(ast::ReturnExpression* expr) override {
     BaseVisitor::VisitReturnExpression(expr);
     if (curr_func_type_ == nullptr) {
-      throw types::error::ReturnOutsideFnError(expr->GetLocation().Format());
+      throw types::errors::ReturnOutsideFnError(expr->GetLocation().Format());
     }
 
 
     if (!curr_func_type_->GetReturnType()->Equals(expr->expr_->type)) {
-      throw types::error::WrongReturnTypeError(expr->GetLocation().Format());
+      throw types::errors::WrongReturnTypeError(expr->GetLocation().Format());
     }
 
     expr->type = expr->expr_->type;
   }
 
-  void VisitExprStatement(ExprStatement* stmt) override {
+  void VisitExprStatement(ast::ExprStatement* stmt) override {
     BaseVisitor::VisitExprStatement(stmt);
   }
 
-  void VisitAssignmentStatement(AssignmentStatement* stmt) override {
+  void VisitAssignmentStatement(ast::AssignmentStatement* stmt) override {
     BaseVisitor::VisitAssignmentStatement(stmt);
-    auto lhs_lit = dynamic_cast<LiteralExpression*>(stmt->lhs_);
+    auto lhs_lit = dynamic_cast<ast::LiteralExpression*>(stmt->lhs_);
     if (lhs_lit == nullptr || lhs_lit->literal_.type != lex::TokenType::IDENTIFIER) {
-      throw types::error::BadAssignmentError(stmt->GetLocation().Format());
+      throw types::errors::BadAssignmentError(stmt->GetLocation().Format());
     }
 
-    Symbol* lhs_symbol = lhs_lit->scope->Lookup(lhs_lit->literal_.GetIdentifier(), lhs_lit->GetLocation());
-    if (lhs_symbol->type != SymbolType::VarDecl) {
-      throw types::error::NonVarAssignError(stmt->GetLocation().Format());
+    ast::Symbol* lhs_symbol = lhs_lit->scope->Lookup(lhs_lit->literal_.GetIdentifier(), lhs_lit->GetLocation());
+    if (lhs_symbol->type != ast::SymbolType::VarDecl) {
+      throw types::errors::NonVarAssignError(stmt->GetLocation().Format());
     }
 
-    if (!stmt->rhs_->type->Equals(std::get<VarSymbol>(lhs_symbol->symbol).type)) {
-      throw types::error::AssignmentTypeMismatchError(stmt->GetLocation().Format());
+    if (!stmt->rhs_->type->Equals(std::get<ast::VarSymbol>(lhs_symbol->symbol).type)) {
+      throw types::errors::AssignmentTypeMismatchError(stmt->GetLocation().Format());
     }
   }
 
-  void VisitVarDeclaration(VarDeclStatement* decl) override {
+  void VisitVarDeclaration(ast::VarDeclStatement* decl) override {
     BaseVisitor::VisitVarDeclaration(decl);
     if (!decl->type_->Equals(decl->init_expr_->type)) {
-      throw types::error::VarDeclInitTypeMismatchError(decl->GetLocation().Format());
+      throw types::errors::VarDeclInitTypeMismatchError(decl->GetLocation().Format());
     }
   }
 
-  void VisitFunDeclaration(FunDeclStatement* decl) override {
+  void VisitFunDeclaration(ast::FunDeclStatement* decl) override {
     types::FunctionType* old = curr_func_type_;
     curr_func_type_ = decl->type_;
     BaseVisitor::VisitFunDeclaration(decl);

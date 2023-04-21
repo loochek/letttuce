@@ -10,11 +10,11 @@ ast::Program* parse::Parser::ParseProgram() {
     try {
       ast::Declaration* decl = ParseDeclaration();
       if (decl == nullptr) {
-        throw parse::error::ParseDeclarationError((lexer_.Peek().location.Format()));
+        throw parse::errors::ParseDeclarationError((lexer_.Peek().location.Format()));
       }
 
       decls.push_back(decl);
-    } catch (parse::error::ParseError& error) {
+    } catch (parse::errors::ParseError& error) {
       ReportError(error);
       Synchronize();
       errors_occured = true;
@@ -22,7 +22,7 @@ ast::Program* parse::Parser::ParseProgram() {
   }
 
   if (errors_occured) {
-    throw parse::error::ParseProgramError();
+    throw parse::errors::ParseProgramError();
   }
 
   return new ast::Program(std::move(decls));
@@ -44,7 +44,7 @@ ast::Declaration* parse::Parser::ParseDeclaration() {
     return fun_declaration;
   }
 
-  throw parse::error::ParseDeclarationError(lexer_.Peek().location.Format());
+  throw parse::errors::ParseDeclarationError(lexer_.Peek().location.Format());
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ ast::FunDeclStatement* parse::Parser::ParseFunDeclStatement(types::Type* type) {
   // TODO: move this checks to the separate pass?
   if (func_type->GetArgTypes().size() != args.size()) {
     // Amount of arguments doesn't match with specified function type
-    throw parse::error::FnDeclArgsCountMismatchError(location.Format());
+    throw parse::errors::FnDeclArgsCountMismatchError(location.Format());
   }
 
   return new ast::FunDeclStatement(fun_name, std::move(args), func_type, body);

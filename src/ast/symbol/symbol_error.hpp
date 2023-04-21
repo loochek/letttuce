@@ -1,11 +1,11 @@
 #pragma once
 
 #include <fmt/core.h>
-#include <error/compile_error.hpp>
+#include <errors/compile_error.hpp>
 
-namespace ast::error {
+namespace ast::errors {
 
-struct SymbolError : ::error::CompileError {};
+struct SymbolError : ::errors::CompileError {};
 
 struct RedefinitionError : SymbolError {
   explicit RedefinitionError(const std::string_view symbol_name, const std::string& location) {

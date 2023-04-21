@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace error {
+namespace errors {
 
 struct CompileError : std::exception {
   std::string message;
@@ -11,4 +11,4 @@ struct CompileError : std::exception {
     return message.c_str();
   }
 };
-}  // namespace error
+}  // namespace errors

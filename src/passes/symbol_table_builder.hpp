@@ -4,10 +4,10 @@
 #include <ast/visitors/base_visitor.hpp>
 #include <ast/symbol/symbol_error.hpp>
 
-namespace ast {
-class SymbolTableBuilder : public BaseVisitor {
+namespace passes {
+class SymbolTableBuilder : public ast::BaseVisitor {
  public:
-  void VisitProgram(Program* prg) override {
+  void VisitProgram(ast::Program* prg) override {
     // Root scope
     PushScope(lex::Location{});
     // Despite convention below, set program scope as root scope
@@ -17,37 +17,37 @@ class SymbolTableBuilder : public BaseVisitor {
     PopScope();
   }
 
-  void VisitBlockExpression(BlockExpression* expr) override {
+  void VisitBlockExpression(ast::BlockExpression* expr) override {
     expr->scope = current_scope_;
     PushScope(expr->GetLocation());
     BaseVisitor::VisitBlockExpression(expr);
     PopScope();
   }
 
-  void VisitVarDeclaration(VarDeclStatement* decl) override {
+  void VisitVarDeclaration(ast::VarDeclStatement* decl) override {
     decl->scope = current_scope_;
     BaseVisitor::VisitVarDeclaration(decl);
 
-    bool success = current_scope_->AddSymbol(Symbol{.type = SymbolType::VarDecl,
+    bool success = current_scope_->AddSymbol(ast::Symbol{.type = ast::SymbolType::VarDecl,
                                         .name = decl->GetName(),
                                         .location = decl->GetLocation(),
                                         .global_scope = global_scope_,
-                                        .symbol = VarSymbol{ .type = decl->type_ }});
+                                        .symbol = ast::VarSymbol{ .type = decl->type_ }});
     if (!success) {
-      throw error::RedefinitionError(decl->GetName(),
-                                     decl->GetLocation().Format());
+      throw ast::errors::RedefinitionError(decl->GetName(),
+                                          decl->GetLocation().Format());
     }
   }
 
-  void VisitFunDeclaration(FunDeclStatement* decl) override {
+  void VisitFunDeclaration(ast::FunDeclStatement* decl) override {
     decl->scope = current_scope_;
-    bool success = current_scope_->AddSymbol(Symbol{.type = SymbolType::FnDecl,
+    bool success = current_scope_->AddSymbol(ast::Symbol{.type = ast::SymbolType::FnDecl,
                                         .name = decl->GetName(),
                                         .location = decl->GetLocation(),
                                         .global_scope = global_scope_,
-                                        .symbol = FnSymbol{ .type = decl->type_ }});
+                                        .symbol = ast::FnSymbol{ .type = decl->type_ }});
     if (!success) {
-      throw error::RedefinitionError(decl->GetName(),
+      throw ast::errors::RedefinitionError(decl->GetName(),
                                      decl->GetLocation().Format());
     }
 
@@ -61,11 +61,11 @@ class SymbolTableBuilder : public BaseVisitor {
     for (size_t i = 0; i < decl->params_.size(); i++) {
       lex::Token& param_token = decl->params_[i];
       types::Type* param_type = param_types[i];
-      current_scope_->AddSymbol(Symbol{.type = SymbolType::VarDecl,
+      current_scope_->AddSymbol(ast::Symbol{.type = ast::SymbolType::VarDecl,
                                       .name = param_token.GetIdentifier(),
                                       .location = param_token.location,
                                       .global_scope = global_scope_,
-                                      .symbol = VarSymbol{ .type =  param_type }});
+                                      .symbol = ast::VarSymbol{ .type =  param_type }});
     }
 
     BaseVisitor::VisitFunDeclaration(decl);
@@ -73,65 +73,65 @@ class SymbolTableBuilder : public BaseVisitor {
     PopScope();
   }
 
-  void VisitLiteralExpression(LiteralExpression* expr) override {
+  void VisitLiteralExpression(ast::LiteralExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitLiteralExpression(expr);
   }
 
-  void VisitComparisonExpression(ComparisonExpression* expr) override {
+  void VisitComparisonExpression(ast::ComparisonExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitComparisonExpression(expr);
   }
 
-  void VisitBinaryExpression(BinaryExpression* expr) override {
+  void VisitBinaryExpression(ast::BinaryExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitBinaryExpression(expr);
   }
 
-  void VisitUnaryExpression(UnaryExpression* expr) override {
+  void VisitUnaryExpression(ast::UnaryExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitUnaryExpression(expr);
   }
 
-  void VisitIfExpression(IfExpression* expr) override {
+  void VisitIfExpression(ast::IfExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitIfExpression(expr);
   }
 
-  void VisitFnCallExpression(FnCallExpression* expr) override {
+  void VisitFnCallExpression(ast::FnCallExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitFnCallExpression(expr);
   }
 
-  void VisitVarAccessExpression(VarAccessExpression* expr) override {
+  void VisitVarAccessExpression(ast::VarAccessExpression* expr) override {
     // Not used????
     expr->scope = current_scope_;
     BaseVisitor::VisitVarAccessExpression(expr);
   }
 
-  void VisitYieldExpression(YieldExpression* expr) override {
+  void VisitYieldExpression(ast::YieldExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitYieldExpression(expr);
   }
 
-  void VisitReturnExpression(ReturnExpression* expr) override {
+  void VisitReturnExpression(ast::ReturnExpression* expr) override {
     expr->scope = current_scope_;
     BaseVisitor::VisitReturnExpression(expr);
   }
 
-  void VisitExprStatement(ExprStatement* stmt) override {
+  void VisitExprStatement(ast::ExprStatement* stmt) override {
     stmt->scope = current_scope_;
     BaseVisitor::VisitExprStatement(stmt);
   }
 
-  void VisitAssignmentStatement(AssignmentStatement* stmt) override {
+  void VisitAssignmentStatement(ast::AssignmentStatement* stmt) override {
     stmt->scope = current_scope_;
     BaseVisitor::VisitAssignmentStatement(stmt);
   }
 
  private:
   void PushScope(lex::Location location) {
-    current_scope_ = new Scope{location, current_scope_};
+    current_scope_ = new ast::Scope{location, current_scope_};
   }
 
   void PopScope() {
@@ -140,7 +140,7 @@ class SymbolTableBuilder : public BaseVisitor {
   }
 
  private:
-  Scope* current_scope_ = nullptr;
+  ast::Scope* current_scope_ = nullptr;
   bool global_scope_ = true;
 };
 }  // namespace ast

@@ -30,7 +30,7 @@ types::Type* parse::Parser::ParsePrimitiveType() {
       return nullptr; // ???
 
     default:
-      throw parse::error::ParseTypeError(next_token.location.Format());
+      throw parse::errors::ParseTypeError(next_token.location.Format());
   }
 }
 

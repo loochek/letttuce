@@ -1,6 +1,6 @@
 #include <parse/parse_error.hpp>
 #include <parse/parser.hpp>
-#include <error/error_handler.hpp>
+#include <errors/error_handler.hpp>
 
 parse::Parser::Parser(lex::Lexer& lexer, utils::Storage<types::Type>& type_keeper) :
       lexer_{lexer}, type_keeper_{type_keeper} {
@@ -8,18 +8,18 @@ parse::Parser::Parser(lex::Lexer& lexer, utils::Storage<types::Type>& type_keepe
 
 void parse::Parser::Consume(lex::TokenType type) {
   if (!Matches(type)) {
-    throw parse::error::ParseTokenError(lex::FormatTokenType(type), FormatLocation());
+    throw parse::errors::ParseTokenError(lex::FormatTokenType(type), FormatLocation());
   }
 }
 
-void parse::Parser::ReportError(const parse::error::ParseError& error) {
-  // TODO: normal error printing
-  if (dynamic_cast<const parse::error::ParseCompoundError*>(&error) != nullptr) {
+void parse::Parser::ReportError(const parse::errors::ParseError& error) {
+  // TODO: normal errors printing
+  if (dynamic_cast<const parse::errors::ParseCompoundError*>(&error) != nullptr) {
     // ew
     return;
   }
 
-  ::error::ErrorHandler::GetInstance().ReportCompileError(error);
+  ::errors::ErrorHandler::GetInstance().ReportCompileError(error);
 }
 
 void parse::Parser::Synchronize() {

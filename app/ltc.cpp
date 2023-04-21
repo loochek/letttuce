@@ -7,9 +7,9 @@
 #include <ast/declarations.hpp>
 
 #include <ast/visitors/print_visitor.hpp>
-#include <ast/visitors/symbol_table_builder.hpp>
-#include <ast/visitors/definition_checker.hpp>
-#include <ast/visitors/type_evaluator.hpp>
+#include <passes/symbol_table_builder.hpp>
+#include <passes/definition_checker.hpp>
+#include <passes/type_evaluator.hpp>
 
 #include <fstream>
 
@@ -27,13 +27,13 @@ int main(int argc, const char* argv[]) {
   parse::Parser parser(lexer, type_keeper);
   ast::Program* prg = parser.ParseProgram();
 
-  ast::SymbolTableBuilder gen;
+  passes::SymbolTableBuilder gen;
   prg->Accept(&gen);
 
-  ast::DefinitionChecker checker;
+  passes::DefinitionChecker checker;
   prg->Accept(&checker);
 
-  ast::TypeEvaluator type_evaluator;
+  passes::TypeEvaluator type_evaluator;
   prg->Accept(&type_evaluator);
 
   ast::PrintVisitor serializer;
